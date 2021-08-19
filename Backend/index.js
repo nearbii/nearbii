@@ -1,8 +1,8 @@
 const express = require("express"),
-jwt = require('jsonwebtoken'),
-bodyParser = require("body-parser"),
-{
-    apiRoutes
+	jwt = require('jsonwebtoken'),
+	bodyParser = require("body-parser"),
+	{
+		apiRoutes
 	} = require("./apiRoutes.ts");
 
 const app = express();
@@ -44,6 +44,7 @@ app.post(apiRoutes.login, function (req, res) {
 	}, SECRETKEY, {
 		expiresIn: `${TOKENLENGTHSECONDS}s`
 	}, (err, token) => {
+		console.log('good login')
 		res.status(200).json({
 			message: `Successfuly logged '${user.username}' in!`,
 			token

@@ -1,5 +1,4 @@
-import React, { useState, useContext } from "react";
-import { Link, useHistory } from "react-router-native";
+import React, { useState } from "react";
 const { routes } = require("../routes");
 import {
   StyleSheet,
@@ -9,27 +8,30 @@ import {
   View,
   TextInput,
 } from "react-native";
-import { AuthContext } from "../Auth";
+import { Link, useHistory } from "react-router-native";
+import { register } from "../api/auth";
 
-interface IauthLoginResp {
-  message: string;
-  token?: string;
-}
-
-export default function Login() {
+export default function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const history = useHistory();
-  //TODO:
-  //@ts-ignore
-  const { authLogin, isAuthenticated } = useContext(AuthContext);
 
-  function handleLogin() {
-    authLogin(username, password).then((res: IauthLoginResp) => {
-      if (res.hasOwnProperty("token")) {
-        history.push("/test");
-      } else alert(res.message);
-    });
+  function handleRegister() {
+    if (password === confirmPassword) {
+      register(username, password)
+        .then(async (res) => {
+          if (res.ok) {
+            history.push(routes.login);
+          } else {
+            const body = await res.json();
+            alert(body.message);
+          }
+        })
+        .catch((err) => console.log(err));
+    } else {
+      alert("Passwords do not match!");
+    }
   }
 
   return (
@@ -47,16 +49,26 @@ export default function Login() {
           style={styles.TextInput}
           placeholder="Password"
           autoCapitalize={"none"}
-          textContentType={"password"}
+          textContentType={"newPassword"}
           secureTextEntry={true}
           onChangeText={(password) => setPassword(password)}
         />
       </View>
-      <Link component={TouchableOpacity} to={routes.register}>
-        <Text style={styles.notRegistered}>Not registered?</Text>
+      <View style={styles.inputView}>
+        <TextInput
+          style={styles.TextInput}
+          placeholder="Confirm Password"
+          autoCapitalize={"none"}
+          textContentType={"newPassword"}
+          secureTextEntry={true}
+          onChangeText={(password) => setConfirmPassword(password)}
+        />
+      </View>
+      <Link component={TouchableOpacity} to={routes.login}>
+        <Text style={styles.alreadyRegistered}>Already registered?</Text>
       </Link>
-      <TouchableOpacity onPress={handleLogin} style={styles.LoginButton}>
-        <Text>LOGIN</Text>
+      <TouchableOpacity onPress={handleRegister} style={styles.RegisterButton}>
+        <Text>REGISTER</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -81,11 +93,11 @@ const styles = StyleSheet.create({
     width: "100%",
     textAlign: "center",
   },
-  notRegistered: {
+  alreadyRegistered: {
     height: 30,
     marginBottom: 30,
   },
-  LoginButton: {
+  RegisterButton: {
     width: "50%",
     borderRadius: 25,
     height: 45,
