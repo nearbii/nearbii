@@ -8,4 +8,10 @@ const client = new Client({
   port: 5432,
 })
 
-export default client.connect();
+export default client.connect((err:any) => {
+    if (err) {
+        console.error('connection error', err.stack)
+    } else {
+        console.log('connected to database')
+    }
+});
