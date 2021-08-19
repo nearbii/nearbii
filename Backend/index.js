@@ -1,8 +1,8 @@
 const express = require("express"),
-	jwt = require('jsonwebtoken'),
-	bodyParser = require("body-parser"),
-	{
-		apiRoutes
+jwt = require('jsonwebtoken'),
+bodyParser = require("body-parser"),
+{
+    apiRoutes
 	} = require("./apiRoutes.ts");
 
 const app = express();
@@ -11,9 +11,11 @@ app.use(bodyParser.json());
 
 const users = [];
 
+//TODO: move to env file
 const SECRETKEY = process.env.SECRETKEY || 'secretkey';
 const TOKENLENGTHSECONDS = process.env.TOKENLENGTHSECONDS || 30;
 
+//TODO: use arrow functions for callbacks
 app.post(apiRoutes.register, function (req, res) {
 	const existingUser = users.find(user => user.username === req.body.username);
 
