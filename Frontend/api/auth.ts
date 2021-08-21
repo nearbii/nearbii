@@ -16,28 +16,3 @@ export default class AuthApi extends BaseApi {
   }
 }
 
-// export function login(username: string, password: string) {
-//   return fetch(`${HOST}:${PORT}${apiRoutes.login}`, {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify({
-//       username: username,
-//       password: password,
-//     }),
-//   });
-// }
-
-// export function register(username: string, password: string) {
-//   return fetch(`${HOST}:${PORT}${apiRoutes.register}`, {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify({
-//       username: username,
-//       password: password,
-//     }),
-//   });
-// }
