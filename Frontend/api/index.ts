@@ -1,5 +1,4 @@
-import axios from 'axios';
-import { config } from 'yargs';
+import axios, { AxiosResponse } from 'axios';
 
 
 //change to your local ip
@@ -11,20 +10,15 @@ interface IConfig {
 }
 
 export default class BaseAPI {
-    config: IConfig
-    constructor(){
-        this.config = {
-            headers: {
-                'content-type':'application/json'
-            }
+    static config: IConfig = {
+        headers: {
+            'content-type':'application/json'
         }
     }
-
-    get(endpoint:string){
-        return axios.get(`${HOST}:${PORT}${endpoint}`, this.config)
+    static get(endpoint:string):Promise<AxiosResponse>{
+        return axios.get(`${HOST}:${PORT}${endpoint}`, this.config);
     }
-
-    post(endpoint:string, body:any){
+    static post(endpoint:string, body:any):Promise<AxiosResponse>{
         return axios.post(`${HOST}${PORT}${endpoint}`,body, this.config);
     }
 }
