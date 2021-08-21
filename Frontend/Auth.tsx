@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
-import PropTypes from "prop-types";
 import AuthApi from "./api/auth";
+
 import { storeAccessToken } from "./clientUtils";
 import {IauthLoginResp} from './Pages/Login'
 
