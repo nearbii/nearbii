@@ -13,7 +13,7 @@ import { AuthContext } from "../Auth";
 
 export interface IauthLoginResp {
   message: string;
-  token?: string;
+  accessToken?: string;
 }
 
 export default function Login() {
@@ -22,14 +22,20 @@ export default function Login() {
   const history = useHistory();
   //TODO:
   //@ts-ignore
-  const { authLogin} = useContext(AuthContext);
+  const { authLogin } = useContext(AuthContext);
 
   function handleLogin() {
-    authLogin(username, password).then(({token, message}: IauthLoginResp) => {
-      if (!!token) {
-        history.push("/test");
-      } else alert(message);
-    });
+    authLogin(username, password)
+      .then(({ accessToken, message }: IauthLoginResp) => {
+        if (!!accessToken) {
+          history.push("/test");
+        }
+      })
+      .catch((err: any) =>
+        err.response.status === 403
+          ? alert(err.response.data.message)
+          : console.log(err)
+      );
   }
 
   return (

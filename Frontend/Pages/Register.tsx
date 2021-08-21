@@ -18,18 +18,16 @@ export default function Register() {
   const history = useHistory();
 
   function handleRegister() {
-    //TODO type
     if (password === confirmPassword) {
       AuthApi.register(username, password)
-        .then(async (res:any) => {
-          if (res.ok) {
-            history.push(routes.login);
-          } else {
-            const body = await res.json();
-            alert(body.message);
-          }
+        .then(({ status, data }: { status: number; data: any }) => {
+          history.push(routes.login);
         })
-        .catch((err) => console.log(err));
+        .catch((err) =>
+          err.response.status === 409
+            ? alert(err.response.data.message)
+            : console.log(err)
+        );
     } else {
       alert("Passwords do not match!");
     }

@@ -25,7 +25,7 @@ app.post(apiRoutes.register, function (req, res) {
 	const existingUser = users.find(user => user.username === req.body.username);
 
 	if (existingUser) {
-		res.status(400).json({
+		res.status(409).json({
 			message: `User '${existingUser.username}' already exists!`
 		})
 	} else {
@@ -44,7 +44,6 @@ app.post(apiRoutes.register, function (req, res) {
 app.post(apiRoutes.login, function (req, res) {
 
 	//TODO: authenticate user properly!
-	console.log('arrived here')
 	const user = users.find(user => user.username === req.body.username && user.password === req.body.password);
 	if (user) {
 		const accessToken = generateAccessToken(user)
