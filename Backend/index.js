@@ -16,8 +16,9 @@ const users = [{
 }];
 
 //TODO: move to env file
-const SECRETKEY = process.env.SECRETKEY || 'secretkey';
-const TOKENLENGTHSECONDS = process.env.TOKENLENGTHSECONDS || 30;
+const ACCESS_TOKEN_SECRETKEY = process.env.ACCESS_TOKEN_SECRETKEY || 'accesssecretkey';
+const REFRESH_TOKEN_SECRETKEY = process.env.REFRESH_TOKEN_SECRETKEY || 'refreshsecretkey';
+const TOKENLENGTHMINS = process.env.TOKENLENGTHMINS || 30;
 
 //TODO: use arrow functions for callbacks
 app.post(apiRoutes.register, function (req, res) {
@@ -45,19 +46,22 @@ app.post(apiRoutes.login, function (req, res) {
 	//TODO: authenticate user properly!
 	console.log('arrived here')
 	const user = users.find(user => user.username === req.body.username && user.password === req.body.password);
-	user ? jwt.sign({
-		user
-	}, SECRETKEY, {
-		expiresIn: `${TOKENLENGTHSECONDS}s`
-	}, (err, token) => {
-		console.log(`'${user.username}' successfully logged in.`)
+	if (user) {
+		const accessToken = generateAccessToken(user)
+		const refreshToken = jwt.sign({
+			user
+		}, REFRESH_TOKEN_SECRETKEY)
 		res.status(200).json({
 			message: `Successfuly logged '${user.username}' in!`,
-			token
+			accessToken,
+			refreshToken
 		})
-	}) : res.status(403).json({
-		message: `Could not authorise credentials.`
-	})
+	} else {
+		res.status(403).json({
+			message: `Could not authorise credentials.`
+		})
+	}
+
 });
 
 app.post(apiRoutes.post, validateToken, function (req, res) {
@@ -75,17 +79,19 @@ function validateToken(req, res, next) {
 	} else {
 		//token is of form 'bearer <tokenvalue>' so separate
 		const token = bearerHeader.split(' ')[1];
-		jwt.verify(token, SECRETKEY, (err, tokenData) => {
-			if (err) {
-				res.sendStatus(403)
-			} else {
-				req.user = {
-					username = tokenData.user.username
-				}
-				next();
-			}
+		jwt.verify(token, ACCESS_TOKEN_SECRETKEY, (err, tokenData) => {
+			console.log(tokenData)
+			err ? res.sendStatus(403) : next();
 		})
 	}
+}
+
+function generateAccessToken(user) {
+	return jwt.sign({
+		user
+	}, ACCESS_TOKEN_SECRETKEY, {
+		expiresIn: `${TOKENLENGTHMINS}m`
+	})
 }
 
 const PORT = process.env.PORT || 5000;

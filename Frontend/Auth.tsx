@@ -1,8 +1,10 @@
+
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import AuthApi from "./api/auth";
 import { storeAccessToken } from "./clientUtils";
 import {IauthLoginResp} from './Pages/Login'
+
 
 export const AuthContext = React.createContext({});
 
@@ -39,7 +41,3 @@ export default function Auth({ children }: IPropsAuth) {
     </AuthContext.Provider>
   );
 }
-
-Auth.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.func, PropTypes.array]),
-};
