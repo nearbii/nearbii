@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import PostApi from "../api/posts";
 
 import {
   StyleSheet,
@@ -7,8 +8,6 @@ import {
   Button,
   TextInput,
 } from "react-native";
-import { createPost } from "../api/posts";
-
 import { AuthContext } from "../Auth";
 import { readAccessToken } from "../clientUtils";
 
@@ -18,7 +17,7 @@ export default function Test() {
   const [postText, setPostText] = useState("");
 
   const handleCreatePost = () => {
-    createPost(postText);
+     PostApi.createPost(postText);
   };
 
   return (

@@ -9,7 +9,7 @@ import {
   TextInput,
 } from "react-native";
 import { Link, useHistory } from "react-router-native";
-import { register } from "../api/auth";
+import AuthApi from "../api/auth";
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -18,9 +18,10 @@ export default function Register() {
   const history = useHistory();
 
   function handleRegister() {
+    //TODO type
     if (password === confirmPassword) {
-      register(username, password)
-        .then(async (res) => {
+      AuthApi.register(username, password)
+        .then(async (res:any) => {
           if (res.ok) {
             history.push(routes.login);
           } else {
