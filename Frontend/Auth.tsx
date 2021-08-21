@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types";
-import { register, login } from "./api/auth";
+import { login } from "./api/auth";
 
 export const AuthContext = React.createContext({});
 
@@ -29,7 +28,3 @@ export default function Auth({ children }: any) {
     </AuthContext.Provider>
   );
 }
-
-Auth.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.func, PropTypes.array]),
-};

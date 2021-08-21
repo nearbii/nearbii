@@ -1,6 +1,6 @@
 const { apiRoutes } = require("../apiRoutes");
 
-const HOST = process.env.HOST || "http://192.168.1.154";
+const HOST = process.env.HOST || "http://192.168.1.2";
 const PORT = process.env.PORT || 5000;
 
 export function login(username: string, password: string) {
