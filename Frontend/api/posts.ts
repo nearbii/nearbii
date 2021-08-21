@@ -1,19 +1,16 @@
-import { readAccessToken } from "../clientUtils";
+//Base
+import { AxiosResponse } from "axios";
+import BaseAPI from ".";
 
+//App
 const { apiRoutes } = require("../apiRoutes");
 
-const HOST = process.env.HOST || "http://192.168.1.2";
-const PORT = process.env.PORT || 5000;
-
-export async function createPost(postText: string) {
-  return fetch(`${HOST}:${PORT}${apiRoutes.post}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${await readAccessToken()}`,
-    },
-    body: JSON.stringify({
-      text: postText,
-    }),
-  });
-}
+export default class PostApi extends BaseAPI {
+  constructor(){
+    super();
+  }
+  public static createPost(text:string):Promise<AxiosResponse>{
+    const {post} = apiRoutes
+    return this.post(post, {text: text})
+  }
+};

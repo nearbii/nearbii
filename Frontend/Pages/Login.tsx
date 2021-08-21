@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { AuthContext } from "../Auth";
 
-interface IauthLoginResp {
+export interface IauthLoginResp {
   message: string;
   token?: string;
 }
@@ -22,13 +22,13 @@ export default function Login() {
   const history = useHistory();
   //TODO:
   //@ts-ignore
-  const { authLogin, isAuthenticated } = useContext(AuthContext);
+  const { authLogin} = useContext(AuthContext);
 
   function handleLogin() {
-    authLogin(username, password).then((res: IauthLoginResp) => {
-      if (res.hasOwnProperty("token")) {
+    authLogin(username, password).then(({token, message}: IauthLoginResp) => {
+      if (!!token) {
         history.push("/test");
-      } else alert(res.message);
+      } else alert(message);
     });
   }
 

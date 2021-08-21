@@ -1,19 +1,32 @@
-import React, { useState, useEffect } from "react";
 
-import { login } from "./api/auth";
+import React, { useState } from "react";
+import AuthApi from "./api/auth";
+
 import { storeAccessToken } from "./clientUtils";
+import {IauthLoginResp} from './Pages/Login'
+
 
 export const AuthContext = React.createContext({});
 
-export default function Auth({ children }: any) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+interface IPropsAuth {
+  children:any;
+}
 
-  const authLogin = (username: string, password: string) => {
-    return login(username, password).then((res) => {
-      setIsAuthenticated(res.ok);
-      const jsn = res.json();
-      jsn.then((jsn) => jsn.hasOwnProperty("token") && storeAccessToken(jsn.token));
-      return jsn;
+
+
+export default function Auth({ children }: IPropsAuth) {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+
+  const authLogin = (username: string, password: string):Promise<IauthLoginResp> => {
+    return AuthApi.login(username, password).then(({status, data}:{status:number, data:any}) => {
+      if(status === 200){
+        setIsAuthenticated(true);
+        const {token} = data;
+        if(!!token){
+          storeAccessToken(token)
+        }
+        return data;
+      }
     });
   };
 
