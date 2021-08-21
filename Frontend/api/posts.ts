@@ -1,4 +1,4 @@
-import { readToken } from "../clientUtils";
+import { readAccessToken } from "../clientUtils";
 
 const { apiRoutes } = require("../apiRoutes");
 
@@ -10,7 +10,7 @@ export async function createPost(postText: string) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${await readToken()}`,
+      Authorization: `Bearer ${await readAccessToken()}`,
     },
     body: JSON.stringify({
       text: postText,

@@ -1,23 +1,20 @@
 import { AsyncStorage } from "react-native";
 
-export const storeToken = async (key: string, val: string) => {
+export const storeAccessToken = async (val: string) => {
   try {
-    await AsyncStorage.setItem(key, val);
+    await AsyncStorage.setItem("accessToken", val);
   } catch (error) {
     console.log(error);
-    // Error saving data
   }
 };
 
-export const readToken = async () => {
+export const readAccessToken = async () => {
   try {
-    const value = await AsyncStorage.getItem("authToken");
+    const value = await AsyncStorage.getItem("accessToken");
     if (value !== null) {
-      // We have data!!
-      console.log(value);
       return value;
     }
   } catch (error) {
-    // Error retrieving data
+    console.log(error);
   }
 };

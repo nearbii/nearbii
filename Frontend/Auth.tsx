@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { register, login } from "./api/auth";
-import { storeToken } from "./clientUtils";
+import { storeAccessToken } from "./clientUtils";
 
 export const AuthContext = React.createContext({});
 
@@ -12,10 +12,7 @@ export default function Auth({ children }: any) {
     return login(username, password).then((res) => {
       setIsAuthenticated(res.ok);
       const jsn = res.json();
-      jsn.then(
-        (jsn) =>
-          jsn.hasOwnProperty("token") && storeToken("authToken", jsn.token)
-      );
+      jsn.then((jsn) => jsn.hasOwnProperty("token") && storeAccessToken(jsn.token));
       return jsn;
     });
   };

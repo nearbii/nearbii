@@ -10,7 +10,7 @@ import {
 import { createPost } from "../api/posts";
 
 import { AuthContext } from "../Auth";
-import { readToken } from "../clientUtils";
+import { readAccessToken } from "../clientUtils";
 
 export default function Test() {
   //@ts-ignore
@@ -26,7 +26,7 @@ export default function Test() {
       style={{ justifyContent: "center", alignItems: "center", height: "100%" }}
     >
       <Text>authenticated: {`${isAuthenticated}`}</Text>
-      <Button title={"console log token"} onPress={readToken} />
+      <Button title={"console log token"} onPress={readAccessToken} />
       <TextInput
         placeholder="create post"
         onChangeText={(postText) => setPostText(postText)}

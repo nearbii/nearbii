@@ -74,7 +74,14 @@ function validateToken(req, res, next) {
 		//token is of form 'bearer <tokenvalue>' so separate
 		const token = bearerHeader.split(' ')[1];
 		jwt.verify(token, SECRETKEY, (err, tokenData) => {
-			err ? res.sendStatus(403) : next();
+			if (err) {
+				res.sendStatus(403)
+			} else {
+				req.user = {
+					username = tokenData.user.username
+				}
+				next();
+			}
 		})
 	}
 }
