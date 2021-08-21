@@ -6,10 +6,14 @@ const express = require("express"),
 	} = require("./apiRoutes.ts");
 
 const app = express();
-
+var cors = require('cors')
 app.use(bodyParser.json());
+app.use(cors());
 
-const users = [];
+const users = [{
+	username: 'q',
+	password: 'q'
+}];
 
 //TODO: move to env file
 const ACCESS_TOKEN_SECRETKEY = process.env.ACCESS_TOKEN_SECRETKEY || 'accesssecretkey';
@@ -38,7 +42,9 @@ app.post(apiRoutes.register, function (req, res) {
 })
 
 app.post(apiRoutes.login, function (req, res) {
+
 	//TODO: authenticate user properly!
+	console.log('arrived here')
 	const user = users.find(user => user.username === req.body.username && user.password === req.body.password);
 	if (user) {
 		const accessToken = generateAccessToken(user)
@@ -59,6 +65,7 @@ app.post(apiRoutes.login, function (req, res) {
 });
 
 app.post(apiRoutes.post, validateToken, function (req, res) {
+	console.log('post created!!')
 	res.status(200).json({
 		message: 'Post created!'
 	});
