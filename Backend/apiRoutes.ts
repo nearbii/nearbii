@@ -3,4 +3,5 @@ module.exports.apiRoutes = {
   logout: "/auth/logout",
   register: "/auth/register",
   post: "/posts/create",
+  token: "/token/get",
 };

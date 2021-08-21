@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { AuthContext } from "../Auth";
 import { readAccessToken } from "../clientUtils";
+import AuthApi from "../api/auth";
 
 export default function Test() {
   //@ts-ignore
@@ -17,7 +18,11 @@ export default function Test() {
   const [postText, setPostText] = useState("");
 
   const handleCreatePost = () => {
-     PostApi.createPost(postText);
+    PostApi.createPost(postText);
+  };
+
+  const handleRefreshToken = () => {
+    AuthApi.updateAccessToken();
   };
 
   return (
@@ -25,12 +30,12 @@ export default function Test() {
       style={{ justifyContent: "center", alignItems: "center", height: "100%" }}
     >
       <Text>authenticated: {`${isAuthenticated}`}</Text>
-      <Button title={"console log token"} onPress={readAccessToken} />
       <TextInput
         placeholder="create post"
         onChangeText={(postText) => setPostText(postText)}
       />
       <Button title={"create post"} onPress={handleCreatePost} />
+      <Button title={"refresh token"} onPress={handleRefreshToken} />
     </SafeAreaView>
   );
 }

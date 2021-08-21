@@ -1,9 +1,12 @@
 const express = require("express"),
-	jwt = require('jsonwebtoken'),
+	jwt = require("jsonwebtoken"),
 	bodyParser = require("body-parser"),
 	{
 		apiRoutes
-	} = require("./apiRoutes.ts");
+	} = require("./apiRoutes.ts"),
+	{
+		Post
+	} = require('./classes.js');
 
 const app = express();
 var cors = require('cors')
@@ -11,8 +14,8 @@ app.use(bodyParser.json());
 app.use(cors());
 
 const users = [{
-	username: 'q',
-	password: 'q'
+	username: "q",
+	password: "q"
 }];
 
 //TODO: move to env file
@@ -50,6 +53,7 @@ app.post(apiRoutes.login, function (req, res) {
 		const refreshToken = jwt.sign({
 			user
 		}, REFRESH_TOKEN_SECRETKEY)
+		refreshTokens.push(refreshToken);
 		res.status(200).json({
 			message: `Successfuly logged '${user.username}' in!`,
 			accessToken,
@@ -63,12 +67,40 @@ app.post(apiRoutes.login, function (req, res) {
 
 });
 
+app.delete(apiRoutes.logout, function (req, res) {
+	//TODO: database it up
+	refreshTokens = refreshTokens.filter(token => token !== req.body.token);
+	res.sendStatus(204)
+})
+
+const posts = [];
+
 app.post(apiRoutes.post, validateToken, function (req, res) {
-	console.log('post created!!')
+	const post = new Post(req.body.text, req.user.username);
+	posts.push(post);
+	console.log(posts);
 	res.status(200).json({
 		message: 'Post created!'
 	});
 });
+
+const refreshTokens = [];
+
+app.post(apiRoutes.token, function (req, res) {
+	//TODO: use database
+	const refreshToken = req.body.refreshToken;
+	//if the token wasnt sent, return 401
+	if (!refreshToken) return res.sendStatus(401);
+	//if the token doesnt exist in our store
+	if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403)
+	jwt.verify(refreshToken, REFRESH_TOKEN_SECRETKEY, (err, tokenData) => {
+		if (err) return res.sendStatus(403);
+		const accessToken = generateAccessToken(tokenData);
+		res.status(200).json({
+			accessToken
+		});
+	})
+})
 
 function validateToken(req, res, next) {
 	//get authorisation header value
@@ -79,13 +111,14 @@ function validateToken(req, res, next) {
 		//token is of form 'bearer <tokenvalue>' so separate
 		const token = bearerHeader.split(' ')[1];
 		jwt.verify(token, ACCESS_TOKEN_SECRETKEY, (err, tokenData) => {
-			console.log(tokenData)
+			req.user = tokenData.user;
 			err ? res.sendStatus(403) : next();
 		})
 	}
 }
 
 function generateAccessToken(user) {
+	if (user.password) delete user.password;
 	return jwt.sign({
 		user
 	}, ACCESS_TOKEN_SECRETKEY, {

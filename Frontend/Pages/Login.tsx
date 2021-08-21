@@ -14,6 +14,7 @@ import { AuthContext } from "../Auth";
 export interface IauthLoginResp {
   message: string;
   accessToken?: string;
+  refreshToken?: string;
 }
 
 export default function Login() {
@@ -26,8 +27,8 @@ export default function Login() {
 
   function handleLogin() {
     authLogin(username, password)
-      .then(({ accessToken, message }: IauthLoginResp) => {
-        if (!!accessToken) {
+      .then(({ accessToken, refreshToken }: IauthLoginResp) => {
+        if (accessToken) {
           history.push("/test");
         }
       })

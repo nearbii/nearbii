@@ -6,11 +6,11 @@ import BaseAPI from ".";
 const { apiRoutes } = require("../apiRoutes");
 
 export default class PostApi extends BaseAPI {
-  constructor(){
+  constructor() {
     super();
   }
-  public static createPost(text:string):Promise<AxiosResponse>{
-    const {post} = apiRoutes
-    return this.post(post, {text: text})
+  public static createPost(text: string): Promise<AxiosResponse> {
+    const { post } = apiRoutes;
+    return this.post(post, { text });
   }
-};
+}

@@ -20,7 +20,7 @@ export default function Register() {
   function handleRegister() {
     if (password === confirmPassword) {
       AuthApi.register(username, password)
-        .then(({ status, data }: { status: number; data: any }) => {
+        .then(() => {
           history.push(routes.login);
         })
         .catch((err) =>
