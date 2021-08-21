@@ -9,7 +9,10 @@ const app = express();
 
 app.use(bodyParser.json());
 
-const users = [];
+const users = [{
+	username: 'q',
+	password: 'q'
+}];
 
 //TODO: move to env file
 const SECRETKEY = process.env.SECRETKEY || 'secretkey';
@@ -37,6 +40,7 @@ app.post(apiRoutes.register, function (req, res) {
 })
 
 app.post(apiRoutes.login, function (req, res) {
+
 	//TODO: authenticate user properly!
 	const user = users.find(user => user.username === req.body.username && user.password === req.body.password);
 	user ? jwt.sign({
@@ -44,7 +48,7 @@ app.post(apiRoutes.login, function (req, res) {
 	}, SECRETKEY, {
 		expiresIn: `${TOKENLENGTHSECONDS}s`
 	}, (err, token) => {
-		console.log('good login')
+		console.log(`'${user.username}' successfully logged in.`)
 		res.status(200).json({
 			message: `Successfuly logged '${user.username}' in!`,
 			token
@@ -55,6 +59,7 @@ app.post(apiRoutes.login, function (req, res) {
 });
 
 app.post(apiRoutes.post, validateToken, function (req, res) {
+	console.log('post created!!')
 	res.status(200).json({
 		message: 'Post created!'
 	});
@@ -69,8 +74,14 @@ function validateToken(req, res, next) {
 		//token is of form 'bearer <tokenvalue>' so separate
 		const token = bearerHeader.split(' ')[1];
 		jwt.verify(token, SECRETKEY, (err, tokenData) => {
-			console.log(tokenData)
-			err ? res.sendStatus(403) : next();
+			if (err) {
+				res.sendStatus(403)
+			} else {
+				req.user = {
+					username = tokenData.user.username
+				}
+				next();
+			}
 		})
 	}
 }
