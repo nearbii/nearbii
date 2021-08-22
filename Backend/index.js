@@ -21,7 +21,7 @@ const users = [{
 //TODO: move to env file
 const ACCESS_TOKEN_SECRETKEY = process.env.ACCESS_TOKEN_SECRETKEY || 'accesssecretkey';
 const REFRESH_TOKEN_SECRETKEY = process.env.REFRESH_TOKEN_SECRETKEY || 'refreshsecretkey';
-const TOKENLENGTHMINS = process.env.TOKENLENGTHMINS || 30;
+const TOKENLENGTHSECONDS = process.env.TOKENLENGTHSECONDS || 30 * 60;
 
 //TODO: use arrow functions for callbacks
 app.post(apiRoutes.register, function (req, res) {
@@ -45,7 +45,6 @@ app.post(apiRoutes.register, function (req, res) {
 })
 
 app.post(apiRoutes.login, function (req, res) {
-
 	//TODO: authenticate user properly!
 	const user = users.find(user => user.username === req.body.username && user.password === req.body.password);
 	if (user) {
@@ -53,13 +52,18 @@ app.post(apiRoutes.login, function (req, res) {
 		const refreshToken = jwt.sign({
 			user
 		}, REFRESH_TOKEN_SECRETKEY)
+		const expiresAt = new Date().getTime() + TOKENLENGTHSECONDS * 1000;
+
 		refreshTokens.push(refreshToken);
 		res.status(200).json({
 			message: `Successfuly logged '${user.username}' in!`,
 			accessToken,
-			refreshToken
+			refreshToken,
+			expiresAt
 		})
 	} else {
+		console.log(req.body)
+		console.log(users)
 		res.status(403).json({
 			message: `Could not authorise credentials.`
 		})
@@ -110,6 +114,7 @@ function validateToken(req, res, next) {
 	} else {
 		//token is of form 'bearer <tokenvalue>' so separate
 		const token = bearerHeader.split(' ')[1];
+		console.log(bearerHeader)
 		jwt.verify(token, ACCESS_TOKEN_SECRETKEY, (err, tokenData) => {
 			req.user = tokenData.user;
 			err ? res.sendStatus(403) : next();
@@ -122,7 +127,7 @@ function generateAccessToken(user) {
 	return jwt.sign({
 		user
 	}, ACCESS_TOKEN_SECRETKEY, {
-		expiresIn: `${TOKENLENGTHMINS}m`
+		expiresIn: TOKENLENGTHSECONDS
 	})
 }
 

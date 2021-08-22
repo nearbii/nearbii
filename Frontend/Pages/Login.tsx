@@ -32,11 +32,12 @@ export default function Login() {
           history.push("/test");
         }
       })
-      .catch((err: any) =>
+      .catch((err: any) => {
+        console.log(err);
         err.response.status === 403
           ? alert(err.response.data.message)
-          : console.log(err)
-      );
+          : console.log(err);
+      });
   }
 
   return (
