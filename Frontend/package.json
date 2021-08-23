@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "github:react-native-community/async-storage",
+    "@react-native-community/async-storage": "^1.12.1",
     "axios": "^0.21.1",
     "expo": "~42.0.1",
     "expo-status-bar": "~1.0.4",

@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import AuthApi from "./api/auth";
 
-import { storeAccessToken, storeRefreshToken } from "./clientUtils";
+import {
+  storeAccessToken,
+  storeAccessTokenExpiryTime,
+  storeRefreshToken,
+} from "./clientUtils";
 import { IauthLoginResp } from "./Pages/Login";
 
 export const AuthContext = React.createContext({});
@@ -21,8 +25,9 @@ export default function Auth({ children }: IPropsAuth) {
       ({ status, data }: { status: number; data: any }) => {
         if (status === 200) {
           setIsAuthenticated(true);
-          const { accessToken, refreshToken } = data;
+          const { accessToken, refreshToken, expiresAt } = data;
 
+          expiresAt && storeAccessTokenExpiryTime(expiresAt);
           accessToken && storeAccessToken(accessToken);
           refreshToken && storeRefreshToken(refreshToken);
 

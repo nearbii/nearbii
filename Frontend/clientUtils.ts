@@ -1,36 +1,53 @@
-import { AsyncStorage } from "react-native";
+//import AsyncStorage from "@react-native-community/async-storage";
+//import { AsyncStorage } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const storeAccessToken = async (val: string) => {
-  await storeToken("accessToken", val);
+  await storeKeyValue("accessToken", val);
 };
 
-export const readAccessToken = async () => {
-  return await readToken("accessToken");
-};
+export async function readAccessToken(): Promise<string> {
+  return await readValue("accessToken");
+}
 
-export const storeRefreshToken = async (val: string) => {
-  await storeToken("refreshToken", val);
-};
+export async function storeRefreshToken(val: string): Promise<void> {
+  await storeKeyValue("refreshToken", val);
+}
 
-export const readRefreshToken = async () => {
-  return await readToken("refreshToken");
-};
+export async function readRefreshToken(): Promise<string> {
+  return await readValue("refreshToken");
+}
 
-const readToken = async (key: string) => {
+export async function storeAccessTokenExpiryTime(val: number): Promise<void> {
+  return await storeKeyValue("accessTokenExpiryTime", `${val}`);
+}
+
+export async function readAccessTokenExpiryTime(): Promise<number> {
+  const expiryString = await readValue("accessTokenExpiryTime");
+  if (expiryString) {
+    return +expiryString;
+  } else {
+    throw new Error("Couldnt find the access token expiry time!");
+  }
+}
+
+async function readValue(key: string): Promise<string> {
   try {
     const value = await AsyncStorage.getItem(key);
     if (value !== null) {
       return value;
     }
+    throw new Error(`Couldn't find value for key '${key}'`);
   } catch (error) {
     console.log(error);
+    return error;
   }
-};
+}
 
-const storeToken = async (key: string, val: string) => {
+async function storeKeyValue(key: string, val: string): Promise<void> {
   try {
     await AsyncStorage.setItem(key, val);
   } catch (error) {
     console.log(error);
   }
-};
+}
