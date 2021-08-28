@@ -11,15 +11,18 @@ import {
 import { AuthContext } from "../Auth";
 import { readAccessToken, readAccessTokenExpiryTime } from "../clientUtils";
 import AuthApi from "../api/auth";
+import { useHistory } from "react-router-native";
+const { routes } = require("../routes");
 
 export default function Test() {
+  const history = useHistory();
   //@ts-ignore
   const { isAuthenticated } = useContext(AuthContext);
   const [postText, setPostText] = useState("");
   const [accToken, setAccToken] = useState("");
 
   const handleCreatePost = () => {
-    PostApi.createPost(postText).then((res) => console.log(res));
+    PostApi.createPost(postText);
   };
 
   const handleRefreshToken = () => {
@@ -50,6 +53,7 @@ export default function Test() {
         title={"console log acc token expiry time"}
         onPress={async () => console.log(await readAccessTokenExpiryTime())}
       />
+      <Button title={"go to feed"} onPress={() => history.push(routes.feed)} />
     </SafeAreaView>
   );
 }

@@ -1,4 +1,5 @@
 module.exports.routes = {
-  login: "/login",
-  register: "/",
+  login: "/",
+  register: "/register",
+  feed: "/feed",
 };

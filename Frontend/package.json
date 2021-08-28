@@ -8,6 +8,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@material-ui/icons": "^4.11.2",
     "@react-native-async-storage/async-storage": "github:react-native-community/async-storage",
     "@react-native-community/async-storage": "^1.12.1",
     "axios": "^0.21.1",
@@ -17,6 +18,7 @@
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-42.0.0.tar.gz",
+    "react-native-elements": "^3.4.2",
     "react-native-web": "~0.13.12",
     "react-router-native": "^5.2.0"
   },

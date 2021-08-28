@@ -13,4 +13,16 @@ export default class PostApi extends BaseAPI {
     const { post } = apiRoutes;
     return this.post(post, { text });
   }
+  public static getPosts(): Promise<AxiosResponse> {
+    const { getPosts } = apiRoutes;
+    return this.get(getPosts);
+  }
+  public static votePostUp(postID: string): Promise<AxiosResponse> {
+    const { votePostUp } = apiRoutes;
+    return this.post(votePostUp, { postID });
+  }
+  public static votePostDown(postID: string): Promise<AxiosResponse> {
+    const { votePostDown } = apiRoutes;
+    return this.post(votePostDown, { postID });
+  }
 }

@@ -4,7 +4,7 @@ const { apiRoutes } = require("../apiRoutes");
 import AuthApi from "./auth";
 
 //change to your local ip
-const HOST = process.env.HOST || "http://192.168.0.6";
+const HOST = process.env.HOST || "http://127.0.0.1";
 const PORT = process.env.PORT || 5000;
 
 interface IConfig {
@@ -14,8 +14,6 @@ interface IConfig {
 //get new access token if it expires
 axios.interceptors.request.use(
   async (config) => {
-    const timeNow = new Date().getTime();
-
     config.headers = {
       "content-type": "application/json",
       Authorization: `Bearer ${await readAccessToken()}`,
@@ -25,13 +23,17 @@ axios.interceptors.request.use(
       return config;
     }
 
+    const timeNow = new Date().getTime();
+
     return await readAccessTokenExpiryTime()
       .then((expiryTime) => {
         if (timeNow > expiryTime) {
-          return AuthApi.updateAccessToken().then(async (data) => {
-            config.headers.Authorization = `Bearer ${data.accessToken}`;
-            return config;
-          });
+          return AuthApi.updateAccessToken()
+            .then(async (data) => {
+              config.headers.Authorization = `Bearer ${data.accessToken}`;
+              return config;
+            })
+            .catch((err) => console.log(err));
         }
       })
       .then((newConf) => {

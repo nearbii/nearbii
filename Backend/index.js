@@ -21,7 +21,7 @@ const users = [{
 //TODO: move to env file
 const ACCESS_TOKEN_SECRETKEY = process.env.ACCESS_TOKEN_SECRETKEY || 'accesssecretkey';
 const REFRESH_TOKEN_SECRETKEY = process.env.REFRESH_TOKEN_SECRETKEY || 'refreshsecretkey';
-const TOKENLENGTHSECONDS = process.env.TOKENLENGTHSECONDS || 15;
+const TOKENLENGTHSECONDS = process.env.TOKENLENGTHSECONDS || 30 * 60;
 
 //TODO: use arrow functions for callbacks
 app.post(apiRoutes.register, function (req, res) {
@@ -79,8 +79,77 @@ const posts = [];
 app.post(apiRoutes.post, validateToken, function (req, res) {
 	const post = new Post(req.body.text, req.user.username);
 	posts.push(post);
+	console.log(posts)
 	res.status(200).json({
 		message: 'Post created!'
+	});
+});
+
+app.get(apiRoutes.getPosts, validateToken, function (req, res) {
+	res.status(200).json({
+		message: `Successfully got ${posts.length} posts!`,
+		posts
+	});
+});
+
+app.post(apiRoutes.votePostUp, validateToken, function (req, res) {
+	const postID = req.body.postID
+	const post = posts.find(post => post.id === postID)
+
+	if (!post) {
+		//TODO: check http status code
+		res.status(400).json({
+			message: `Can't vote, post with ID ${post.id} couldn't be found!`,
+			post: null
+		});
+		return
+	}
+
+	const vote = post.voteUp();
+
+	if (vote === null) {
+		//TODO: check http status code
+		res.status(400).json({
+			message: `Can't vote, ${post.author===req.user ? 'you are the post author!' : 'you have already voted!'}`,
+			post
+		});
+		return
+	}
+
+	res.status(200).json({
+		message: `Post votes increased to ${post.score}!`,
+		post
+	});
+});
+
+app.post(apiRoutes.votePostDown, validateToken, function (req, res) {
+
+	const postID = req.body.postID
+	const post = posts.find(post => post.id === postID)
+
+	if (!post) {
+		//TODO: check http status code
+		res.status(400).json({
+			message: `Can't vote, post with ID ${post.id} couldn't be found!`,
+			post: null
+		});
+		return
+	}
+
+	const vote = post.voteDown();
+
+	if (vote === null) {
+		//TODO: check http status code
+		res.status(400).json({
+			message: `Can't vote, ${post.author===req.user ? 'you are the post author!' : 'you have already voted!'}`,
+			post
+		});
+		return
+	}
+
+	res.status(200).json({
+		message: `Post votes decreased to ${post.score}!`,
+		post
 	});
 });
 

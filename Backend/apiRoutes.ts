@@ -4,4 +4,7 @@ module.exports.apiRoutes = {
   register: "/auth/register",
   post: "/posts/create",
   token: "/token/get",
+  getPosts: "/posts/get",
+  votePostUp: "/posts/vote/up",
+  votePostDown: "/posts/vote/down",
 };

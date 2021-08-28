@@ -34,7 +34,6 @@ export default class AuthApi extends BaseApi {
     const refreshToken = await readRefreshToken();
     return this.post(token, { refreshToken })
       .then(({ data }: any) => {
-        console.log("here");
         storeAccessToken(data.accessToken);
         storeAccessTokenExpiryTime(data.expiresAt);
         return data;

@@ -34,9 +34,9 @@ export default function Login() {
       })
       .catch((err: any) => {
         console.log(err);
-        err.response.status === 403
-          ? alert(err.response.data.message)
-          : console.log(err);
+        if (err.response.status === 403) {
+          alert(err.response.data.message);
+        }
       });
   }
 
