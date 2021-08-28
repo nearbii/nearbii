@@ -88,7 +88,7 @@ app.post(apiRoutes.post, validateToken, function (req, res) {
 app.get(apiRoutes.getPosts, validateToken, function (req, res) {
 	res.status(200).json({
 		message: `Successfully got ${posts.length} posts!`,
-		posts
+		posts: posts.map(post => post.withoutVoters())
 	});
 });
 
@@ -111,14 +111,14 @@ app.post(apiRoutes.votePostUp, validateToken, function (req, res) {
 		//TODO: check http status code
 		res.status(400).json({
 			message: `Can't vote, ${post.author===req.user ? 'you are the post author!' : 'you have already voted!'}`,
-			post
+			post: post.withoutVoters()
 		});
 		return
 	}
 
 	res.status(200).json({
 		message: `Post votes increased to ${post.score}!`,
-		post
+		post: post.withoutVoters()
 	});
 });
 
@@ -142,14 +142,14 @@ app.post(apiRoutes.votePostDown, validateToken, function (req, res) {
 		//TODO: check http status code
 		res.status(400).json({
 			message: `Can't vote, ${post.author===req.user ? 'you are the post author!' : 'you have already voted!'}`,
-			post
+			post: post.withoutVoters()
 		});
 		return
 	}
 
 	res.status(200).json({
 		message: `Post votes decreased to ${post.score}!`,
-		post
+		post: post.withoutVoters()
 	});
 });
 

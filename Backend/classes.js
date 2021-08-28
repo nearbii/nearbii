@@ -15,25 +15,44 @@ module.exports.Post = class Post {
 		this.author = author;
 		this.date = new Date().getTime();
 		this.id = `P${uuidv4()}`
-		this.voters = [];
+		this.downVoters = [];
+		this.upVoters = [];
 		this.score = 0;
 	}
 
 	voteUp(voterUsername) {
-		if (this.author === voterUsername || this.voters.includes(voterUsername)) return null
+		if (this.author === voterUsername || this.upVoters.includes(voterUsername)) return null
 		else {
-			this.voters.push(voterUsername)
+			if (this.downVoters.includes(voterUsername)) {
+				this.downVoters = this.downVoters.filter(voter => voter !== voterUsername)
+				this.score++
+			}
+			this.upVoters.push(voterUsername)
 			this.score++
 			return this.score
 		}
 	}
 
 	voteDown(voterUsername) {
-		if (this.author === voterUsername || this.voters.includes(voterUsername)) return null
+		if (this.author === voterUsername || this.downVoters.includes(voterUsername)) return null
 		else {
-			this.voters.push(voterUsername)
+			if (this.upVoters.includes(voterUsername)) {
+				this.upVoters = this.upVoters.filter(voter => voter !== voterUsername)
+				this.score--
+			}
+			this.downVoters.push(voterUsername)
 			this.score--
 			return this.score
+		}
+	}
+
+	withoutVoters() {
+		return {
+			text: this.text,
+			author: this.author,
+			date: this.date,
+			id: this.id,
+			score: this.score
 		}
 	}
 
