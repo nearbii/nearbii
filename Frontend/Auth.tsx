@@ -37,6 +37,8 @@ export default function Auth({ children }: IPropsAuth) {
     );
   };
 
+  
+
   return (
     <AuthContext.Provider
       value={{

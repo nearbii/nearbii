@@ -77,7 +77,7 @@ app.delete(apiRoutes.logout, function (req, res) {
 const posts = [];
 
 app.post(apiRoutes.post, validateToken, function (req, res) {
-	const post = new Post(req.body.text, req.user.username);
+	const post = new Post(req.body.text, req.user.username, req.body.location.coords);
 	posts.push(post);
 	console.log(posts)
 	res.status(200).json({

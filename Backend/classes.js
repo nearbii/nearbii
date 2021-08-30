@@ -10,11 +10,15 @@ module.exports.Post = class Post {
 	// voters: string[];
 	//score: number;
 
-	constructor(text, author) {
+	constructor(text, author, location) {
 		this.text = text;
 		this.author = author;
+		this.location = {
+			latitude: location.latitude,
+			longitude: location.longitude
+		};
 		this.date = new Date().getTime();
-		this.id = `P${uuidv4()}`
+		this.id = `P${uuidv4()}`;
 		this.downVoters = [];
 		this.upVoters = [];
 		this.score = 0;

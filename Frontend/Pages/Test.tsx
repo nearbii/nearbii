@@ -1,5 +1,6 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import PostApi from "../api/posts";
+import * as Location from "expo-location";
 
 import {
   StyleSheet,
@@ -7,11 +8,13 @@ import {
   SafeAreaView,
   Button,
   TextInput,
+  View,
 } from "react-native";
 import { AuthContext } from "../Auth";
 import { readAccessToken, readAccessTokenExpiryTime } from "../clientUtils";
 import AuthApi from "../api/auth";
 import { useHistory } from "react-router-native";
+import { LocationObject } from "expo-location";
 const { routes } = require("../routes");
 
 export default function Test() {
@@ -20,6 +23,8 @@ export default function Test() {
   const { isAuthenticated } = useContext(AuthContext);
   const [postText, setPostText] = useState("");
   const [accToken, setAccToken] = useState("");
+  const [location, setLocation] = useState<LocationObject | null>(null);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleCreatePost = () => {
     PostApi.createPost(postText);
@@ -33,10 +38,33 @@ export default function Test() {
     setAccToken(await readAccessToken());
   }
 
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    })();
+  }, []);
+
+  let text = "Waiting..";
+  if (errorMsg) {
+    text = errorMsg;
+  } else if (location) {
+    text = JSON.stringify(location);
+  }
+
   return (
     <SafeAreaView
       style={{ justifyContent: "center", alignItems: "center", height: "100%" }}
     >
+      <View>
+        <Text>location = {text}</Text>
+      </View>
       <Text>acc token: {accToken}</Text>
       <Text>authenticated: {`${isAuthenticated}`}</Text>
       <TextInput

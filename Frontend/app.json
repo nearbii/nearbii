@@ -13,11 +13,13 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Allow Nearbii to access your device's location",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Allow Nearbii to access your device's location"
+      }
     },
     "android": {
       "adaptiveIcon": {
