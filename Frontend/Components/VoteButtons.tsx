@@ -1,5 +1,6 @@
 import React from "react";
-import { ExpandMore, ExpandLess } from "@material-ui/icons";
+import { MaterialIcons } from "@expo/vector-icons";
+
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 
 interface IProps {
@@ -12,11 +13,11 @@ export default function VoteButtons({ onUp, onDown, score }: IProps) {
   return (
     <View style={styles.buttons}>
       <TouchableOpacity onPress={onUp}>
-        <Text>+{/* <ExpandLess /> */}</Text>
+        <MaterialIcons name="expand-less" size={28} />
       </TouchableOpacity>
       <Text>{score}</Text>
       <TouchableOpacity onPress={onDown}>
-        <Text>-{/* <ExpandMore /> */}</Text>
+        <MaterialIcons name="expand-more" size={28} />
       </TouchableOpacity>
     </View>
   );
@@ -25,6 +26,5 @@ export default function VoteButtons({ onUp, onDown, score }: IProps) {
 const styles = StyleSheet.create({
   buttons: {
     alignItems: "center",
-    //alignSelf: "flex-end",
   },
 });

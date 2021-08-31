@@ -24,20 +24,11 @@ export default function Test() {
   //@ts-ignore
   const { isAuthenticated } = useContext(AuthContext);
   const [postText, setPostText] = useState("");
-  const [accToken, setAccToken] = useState("");
   const [location, setLocation] = useState<LocationObject | null>(null);
 
   const handleCreatePost = () => {
     PostApi.createPost(postText);
   };
-
-  const handleRefreshToken = () => {
-    AuthApi.updateAccessToken();
-  };
-
-  async function updateDisplayToken(): Promise<void> {
-    setAccToken(await readAccessToken());
-  }
 
   useEffect(() => {
     LocationAPI.getLocation().then((location: LocationObject) =>
@@ -45,34 +36,17 @@ export default function Test() {
     );
   }, []);
 
-  let text = "Waiting..";
-  if (location) {
-    text = JSON.stringify(location);
-  }
-
   return (
     <SafeAreaView
       style={{ justifyContent: "center", alignItems: "center", height: "100%" }}
     >
-      <View>
-        <Text>location = {text}</Text>
-      </View>
-      <Text>acc token: {accToken}</Text>
+      <Text>location = {JSON.stringify(location)}</Text>
       <Text>authenticated: {`${isAuthenticated}`}</Text>
       <TextInput
         placeholder="create post"
         onChangeText={(postText) => setPostText(postText)}
       />
       <Button title={"create post"} onPress={handleCreatePost} />
-      <Button title={"refresh token"} onPress={handleRefreshToken} />
-      <Button
-        title={"update displayed access token"}
-        onPress={updateDisplayToken}
-      />
-      <Button
-        title={"console log acc token expiry time"}
-        onPress={async () => console.log(await readAccessTokenExpiryTime())}
-      />
       <Button title={"go to feed"} onPress={() => history.push(routes.feed)} />
     </SafeAreaView>
   );
