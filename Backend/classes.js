@@ -54,6 +54,7 @@ module.exports.Post = class Post {
 		return {
 			text: this.text,
 			author: this.author,
+			location: this.location,
 			date: this.date,
 			id: this.id,
 			score: this.score

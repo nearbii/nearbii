@@ -9,7 +9,10 @@ const express = require("express"),
 	} = require('./classes.js');
 
 const app = express();
-var cors = require('cors')
+var cors = require('cors');
+const {
+	isInRadius
+} = require("./backendUtils.js");
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -22,6 +25,8 @@ const users = [{
 const ACCESS_TOKEN_SECRETKEY = process.env.ACCESS_TOKEN_SECRETKEY || 'accesssecretkey';
 const REFRESH_TOKEN_SECRETKEY = process.env.REFRESH_TOKEN_SECRETKEY || 'refreshsecretkey';
 const TOKENLENGTHSECONDS = process.env.TOKENLENGTHSECONDS || 30 * 60;
+//in km
+const DISTANCERADIUS = process.env.DISTANCERADIUS || 5;
 
 //TODO: use arrow functions for callbacks
 app.post(apiRoutes.register, function (req, res) {
@@ -79,16 +84,23 @@ const posts = [];
 app.post(apiRoutes.post, validateToken, function (req, res) {
 	const post = new Post(req.body.text, req.user.username, req.body.location.coords);
 	posts.push(post);
-	console.log(posts)
 	res.status(200).json({
 		message: 'Post created!'
 	});
 });
 
-app.get(apiRoutes.getPosts, validateToken, function (req, res) {
+app.post(apiRoutes.getPosts, validateToken, function (req, res) {
+	const {
+		latitude,
+		longitude
+	} = req.body.location.coords
+
 	res.status(200).json({
 		message: `Successfully got ${posts.length} posts!`,
-		posts: posts.map(post => post.withoutVoters())
+		posts: posts.map(post => post.withoutVoters()).filter(post => isInRadius(post.location, {
+			latitude,
+			longitude
+		}, 5))
 	});
 });
 

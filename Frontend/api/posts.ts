@@ -4,17 +4,12 @@ import BaseAPI from ".";
 
 //Location Info
 import * as Location from "expo-location";
+import { ILocation } from "../Interfaces";
+import LocationAPI from "./location";
+import { LocationObject } from "expo-location";
 
 //App
 const { apiRoutes } = require("../apiRoutes");
-
-async function getLocation() {
-  let { status } = await Location.requestForegroundPermissionsAsync();
-  if (status !== "granted") {
-    throw new Error("Permission to access location was denied");
-  }
-  return await Location.getCurrentPositionAsync({});
-}
 
 export default class PostApi extends BaseAPI {
   constructor() {
@@ -22,15 +17,15 @@ export default class PostApi extends BaseAPI {
   }
   public static createPost(text: string): Promise<any> {
     const { post } = apiRoutes;
-    return getLocation()
+    return LocationAPI.getLocation()
       .then((location) => {
         this.post(post, { text, location });
       })
       .catch((e) => console.log(e));
   }
-  public static getPosts(): Promise<AxiosResponse> {
+  public static getPosts(location: LocationObject): Promise<AxiosResponse> {
     const { getPosts } = apiRoutes;
-    return this.get(getPosts);
+    return this.post(getPosts, { location });
   }
   public static votePostUp(postID: string): Promise<AxiosResponse> {
     const { votePostUp } = apiRoutes;

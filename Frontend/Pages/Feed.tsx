@@ -11,20 +11,28 @@ import { useEffect } from "react";
 import { useHistory } from "react-router-native";
 import PostApi from "../api/posts";
 import Post from "../Components/Post";
-import { IPost } from "../Interfaces";
+import { ILocation, IPost } from "../Interfaces";
+import LocationAPI from "../api/location";
 
 export default function Feed() {
   const [posts, setPosts] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const history = useHistory();
 
+  const [location, setLocation] = useState<ILocation>({
+    latitude: 0,
+    longitude: 0,
+  });
+
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     refreshPosts().then(() => setRefreshing(false));
   }, []);
 
-  function refreshPosts() {
-    return PostApi.getPosts().then((res) => {
+  async function refreshPosts() {
+    const location = await LocationAPI.getLocation();
+
+    return PostApi.getPosts(location).then((res) => {
       console.log(res.data.posts);
       setPosts(res.data.posts);
     });

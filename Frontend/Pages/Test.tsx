@@ -15,6 +15,8 @@ import { readAccessToken, readAccessTokenExpiryTime } from "../clientUtils";
 import AuthApi from "../api/auth";
 import { useHistory } from "react-router-native";
 import { LocationObject } from "expo-location";
+import LocationAPI from "../api/location";
+import { ILocation } from "../Interfaces";
 const { routes } = require("../routes");
 
 export default function Test() {
@@ -24,7 +26,6 @@ export default function Test() {
   const [postText, setPostText] = useState("");
   const [accToken, setAccToken] = useState("");
   const [location, setLocation] = useState<LocationObject | null>(null);
-  const [errorMsg, setErrorMsg] = useState("");
 
   const handleCreatePost = () => {
     PostApi.createPost(postText);
@@ -39,22 +40,13 @@ export default function Test() {
   }
 
   useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-    })();
+    LocationAPI.getLocation().then((location: LocationObject) =>
+      setLocation(location)
+    );
   }, []);
 
   let text = "Waiting..";
-  if (errorMsg) {
-    text = errorMsg;
-  } else if (location) {
+  if (location) {
     text = JSON.stringify(location);
   }
 
