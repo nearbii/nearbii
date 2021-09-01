@@ -120,11 +120,11 @@ app.post(apiRoutes.getPosts, validateToken, function (req, res) {
 
 	const postsWithHiddenVoters = postsInRadius.map(post => post.withoutVoters())
 
-	const sortedPosts = postsWithHiddenVoters.sort((postA, postB) => postB.date - postA.date)
+	// const sortedPosts = postsWithHiddenVoters.sort((postA, postB) => postB.date - postA.date)
 
 	res.status(200).json({
 		message: `Successfully got ${posts.length} posts!`,
-		posts: sortedPosts
+		posts: postsWithHiddenVoters
 	});
 });
 

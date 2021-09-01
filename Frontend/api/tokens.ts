@@ -1,4 +1,5 @@
 import StorageAPI from "./storage";
+import BaseAPI from ".";
 
 export default class TokenAPI {
   public static async storeAccessToken(val: string): Promise<void> {

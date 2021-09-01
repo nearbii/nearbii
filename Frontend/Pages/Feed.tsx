@@ -16,11 +16,12 @@ import LocationAPI from "../api/location";
 import NewPostButton from "../Components/NewPostButton";
 import NewPostModal from "../Components/NewPostModal";
 import { LocationObject } from "expo-location";
+import FeedHeader from "../Components/FeedHeader";
 
 export default function Feed() {
   const [posts, setPosts] = useState([]);
   const [postText, setPostText] = useState("");
-  const [location, setLocation] = useState<LocationObject | null>(null);
+  const [sortPostsBy, setSortPostsBy] = useState("new");
   const [modalVisible, setModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const history = useHistory();
@@ -55,8 +56,21 @@ export default function Feed() {
     refreshPosts();
   }, []);
 
+  useEffect(() => {
+    if (sortPostsBy === "new") {
+      setPosts(
+        posts.sort((postA: IPost, postB: IPost) => postB.score - postA.score)
+      );
+    } else if (sortPostsBy === "hot") {
+      setPosts(
+        posts.sort((postA: IPost, postB: IPost) => postB.date - postA.date)
+      );
+    }
+  }, [sortPostsBy, posts]);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <FeedHeader sortPostsBy={sortPostsBy} setSortPostsBy={setSortPostsBy} />
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

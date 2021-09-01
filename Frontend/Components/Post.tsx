@@ -17,7 +17,7 @@ export default function Post(props: IProps) {
   const [displayScore, setDisplayScore] = useState(score);
 
   const increaseScore = () => {
-    setDisplayScore(score + 1);
+    setDisplayScore(displayScore + 1);
     PostApi.votePostUp(id)
       .then((res) => {
         refreshPosts();
@@ -26,7 +26,7 @@ export default function Post(props: IProps) {
   };
 
   const decreaseScore = () => {
-    setDisplayScore(score - 1);
+    setDisplayScore(displayScore - 1);
     PostApi.votePostDown(id)
       .then((res) => {
         refreshPosts();
