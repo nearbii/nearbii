@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { AuthContext } from "../Auth";
 import { readAccessToken, readAccessTokenExpiryTime } from "../TokenAccessObject";
-import AuthApi from "../api/auth";
+import AuthAPI from "../api/auth";
 import { useHistory } from "react-router-native";
 import { LocationObject } from "expo-location";
 import LocationAPI from "../api/location";

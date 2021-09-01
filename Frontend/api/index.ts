@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from "axios";
-import { readAccessToken, readAccessTokenExpiryTime } from "../TokenAccessObject";
 const { apiRoutes } = require("../apiRoutes");
-import AuthApi from "./auth";
+import AuthAPI from "./auth";
+import TokenAPI from "./tokens";
 
 //change to your local ip
 const HOST = process.env.HOST || "http://127.0.0.1";
@@ -16,7 +16,7 @@ axios.interceptors.request.use(
   async (config) => {
     config.headers = {
       "content-type": "application/json",
-      Authorization: `Bearer ${await readAccessToken()}`,
+      Authorization: `Bearer ${await TokenAPI.readAccessToken()}`,
     };
 
     if (config.url?.includes(apiRoutes.token)) {
@@ -25,10 +25,10 @@ axios.interceptors.request.use(
 
     const timeNow = new Date().getTime();
 
-    return await readAccessTokenExpiryTime()
+    return await TokenAPI.readAccessTokenExpiryTime()
       .then((expiryTime) => {
         if (timeNow > expiryTime) {
-          return AuthApi.updateAccessToken()
+          return AuthAPI.updateAccessToken()
             .then(async (data) => {
               config.headers.Authorization = `Bearer ${data.accessToken}`;
               return config;

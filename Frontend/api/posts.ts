@@ -3,8 +3,6 @@ import { AxiosResponse } from "axios";
 import BaseAPI from ".";
 
 //Location Info
-import * as Location from "expo-location";
-import { ILocation } from "../Interfaces";
 import LocationAPI from "./location";
 import { LocationObject } from "expo-location";
 

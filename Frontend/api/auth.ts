@@ -1,13 +1,9 @@
 const { apiRoutes } = require("../apiRoutes");
 import { AxiosResponse } from "axios";
-import BaseApi from ".";
-import {
-  readRefreshToken,
-  storeAccessToken,
-  storeAccessTokenExpiryTime,
-} from "../TokenAccessObject";
+import BaseAPI from ".";
+import TokenAPI from "./tokens";
 
-export default class AuthApi extends BaseApi {
+export default class AuthAPI extends BaseAPI {
   constructor() {
     super();
   }
@@ -30,11 +26,11 @@ export default class AuthApi extends BaseApi {
     expiresAt: number;
   }> {
     const { token } = apiRoutes;
-    const refreshToken = await readRefreshToken();
+    const refreshToken = await TokenAPI.readRefreshToken();
     return this.post(token, { refreshToken })
       .then(({ data }: any) => {
-        storeAccessToken(data.accessToken);
-        storeAccessTokenExpiryTime(data.expiresAt);
+        TokenAPI.storeAccessToken(data.accessToken);
+        TokenAPI.storeAccessTokenExpiryTime(data.expiresAt);
         return data;
       })
       .catch((err: Error) => {
