@@ -11,7 +11,7 @@ const express = require("express"),
 const app = express();
 var cors = require('cors');
 const {
-	isInRadius
+	isInRadius,
 } = require("./backendUtils.js");
 app.use(bodyParser.json());
 app.use(cors());
@@ -89,6 +89,12 @@ app.post(apiRoutes.post, validateToken, function (req, res) {
 		});
 		return
 	}
+	if (req.body.text.length === 0) {
+		res.status(404).json({
+			message: 'Post cannot be empty!'
+		});
+		return
+	}
 	const post = new Post(req.body.text, req.user.username, req.body.location.coords);
 	posts.push(post);
 	res.status(200).json({
@@ -102,12 +108,18 @@ app.post(apiRoutes.getPosts, validateToken, function (req, res) {
 		longitude
 	} = req.body.location.coords
 
+	const postsInRadius = posts.filter(post => isInRadius(post.location, {
+		latitude,
+		longitude
+	}, DISTANCERADIUS))
+
+	const postsWithHiddenVoters = postsInRadius.map(post => post.withoutVoters())
+
+	const sortedPosts = postsWithHiddenVoters.sort((postA, postB) => postB.date - postA.date)
+
 	res.status(200).json({
 		message: `Successfully got ${posts.length} posts!`,
-		posts: posts.map(post => post.withoutVoters()).filter(post => isInRadius(post.location, {
-			latitude,
-			longitude
-		}, DISTANCERADIUS))
+		posts: sortedPosts
 	});
 });
 

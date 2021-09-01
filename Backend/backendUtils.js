@@ -1,4 +1,4 @@
-//const { ILocation } = require("./Interfaces.ts");
+//const { ILocation, IPost } = require("./Interfaces.ts");
 function toRadians(degrees) {
 	return (degrees * Math.PI) / 180;
 }

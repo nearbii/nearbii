@@ -40,6 +40,7 @@ export default function Feed() {
   }
 
   const handleCreatePost = () => {
+    if (postText.length === 0) return;
     PostApi.createPost(postText)
       .then(() => {
         setRefreshing(true);
