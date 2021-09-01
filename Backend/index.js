@@ -1,3 +1,4 @@
+//CORE
 const express = require("express"),
 	jwt = require("jsonwebtoken"),
 	bodyParser = require("body-parser"),
@@ -9,10 +10,12 @@ const express = require("express"),
 	} = require('./classes.js');
 
 const app = express();
-var cors = require('cors');
+const cors = require('cors');
 const {
 	isInRadius,
 } = require("./backendUtils.js");
+//CUSTOM
+const {validateToken} = require('./Middleware/Authentication/index.ts');
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -192,7 +195,8 @@ app.post(apiRoutes.token, function (req, res) {
 	//if the token wasnt sent, return 401
 	if (!refreshToken) return res.sendStatus(401);
 	//if the token doesnt exist in our store
-	if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403)
+	if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
+
 	jwt.verify(refreshToken, REFRESH_TOKEN_SECRETKEY, (err, tokenData) => {
 		if (err) return res.sendStatus(403);
 		const accessToken = generateAccessToken(tokenData);
@@ -203,26 +207,6 @@ app.post(apiRoutes.token, function (req, res) {
 		});
 	})
 })
-
-function validateToken(req, res, next) {
-	//get authorisation header value
-	const bearerHeader = req.headers["authorization"];
-	if (bearerHeader === undefined) {
-		res.sendStatus(403);
-	} else {
-		//token is of form 'bearer <tokenvalue>' so separate
-		const token = bearerHeader.split(' ')[1];
-
-		jwt.verify(token, ACCESS_TOKEN_SECRETKEY, (err, tokenData) => {
-			if (err) {
-				res.sendStatus(403)
-			} else {
-				req.user = tokenData.user;
-				next();
-			}
-		})
-	}
-}
 
 function generateAccessToken(user) {
 	const returnUser = {
