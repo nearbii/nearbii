@@ -15,7 +15,9 @@ const {
 	isInRadius,
 } = require("./backendUtils.js");
 //CUSTOM
-const {validateToken} = require('./Middleware/Authentication/index.ts');
+const {
+	validateToken
+} = require('./Middleware/Authentication/index.ts');
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -139,7 +141,7 @@ app.post(apiRoutes.votePostUp, validateToken, function (req, res) {
 		return
 	}
 
-	const vote = post.voteUp();
+	const vote = post.voteUp(req.user.username);
 
 	if (vote === null) {
 		//TODO: check http status code
@@ -170,7 +172,7 @@ app.post(apiRoutes.votePostDown, validateToken, function (req, res) {
 		return
 	}
 
-	const vote = post.voteDown();
+	const vote = post.voteDown(req.user.username);
 
 	if (vote === null) {
 		//TODO: check http status code

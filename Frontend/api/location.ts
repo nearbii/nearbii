@@ -20,7 +20,7 @@ export default class LocationAPI {
     if (status !== "granted") {
       throw new Error("Permission to access location was denied");
     }
-    console.log("new location stuff!");
+
     StorageAPI.storeKeyValue(
       "lastLocationUpdateTime",
       `${new Date().getTime()}`

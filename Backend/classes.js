@@ -25,8 +25,7 @@ module.exports.Post = class Post {
 	}
 
 	voteUp(voterUsername) {
-		console.log(voterUsername)
-		if (this.author === voterUsername || this.upVoters.includes(voterUsername)) return null
+		if (this.upVoters.includes(voterUsername)) return null
 		else {
 			if (this.downVoters.includes(voterUsername)) {
 				this.downVoters = this.downVoters.filter(voter => voter !== voterUsername)
@@ -39,7 +38,7 @@ module.exports.Post = class Post {
 	}
 
 	voteDown(voterUsername) {
-		if (this.author === voterUsername || this.downVoters.includes(voterUsername)) return null
+		if (this.downVoters.includes(voterUsername)) return null
 		else {
 			if (this.upVoters.includes(voterUsername)) {
 				this.upVoters = this.upVoters.filter(voter => voter !== voterUsername)
