@@ -27,6 +27,7 @@ const REFRESH_TOKEN_SECRETKEY = process.env.REFRESH_TOKEN_SECRETKEY || 'refreshs
 const TOKENLENGTHSECONDS = process.env.TOKENLENGTHSECONDS || 30 * 60;
 //in km
 const DISTANCERADIUS = process.env.DISTANCERADIUS || 5;
+const MAXLENGTH = process.env.POSTMAXLENGTH || 40;
 
 //TODO: use arrow functions for callbacks
 app.post(apiRoutes.register, function (req, res) {
@@ -82,6 +83,12 @@ app.delete(apiRoutes.logout, function (req, res) {
 const posts = [];
 
 app.post(apiRoutes.post, validateToken, function (req, res) {
+	if (req.body.text.length > MAXLENGTH) {
+		res.status(413).json({
+			message: `Post exceeds character limit of ${MAXLENGTH}!`
+		});
+		return
+	}
 	const post = new Post(req.body.text, req.user.username, req.body.location.coords);
 	posts.push(post);
 	res.status(200).json({
@@ -100,7 +107,7 @@ app.post(apiRoutes.getPosts, validateToken, function (req, res) {
 		posts: posts.map(post => post.withoutVoters()).filter(post => isInRadius(post.location, {
 			latitude,
 			longitude
-		}, 5))
+		}, DISTANCERADIUS))
 	});
 });
 

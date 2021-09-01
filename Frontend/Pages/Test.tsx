@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 import { AuthContext } from "../Auth";
-import { readAccessToken, readAccessTokenExpiryTime } from "../clientUtils";
+import { readAccessToken, readAccessTokenExpiryTime } from "../TokenAccessObject";
 import AuthApi from "../api/auth";
 import { useHistory } from "react-router-native";
 import { LocationObject } from "expo-location";

@@ -5,7 +5,7 @@ import {
   storeAccessToken,
   storeAccessTokenExpiryTime,
   storeRefreshToken,
-} from "./clientUtils";
+} from "./TokenAccessObject";
 import { IauthLoginResp } from "./Pages/Login";
 
 export const AuthContext = React.createContext({});

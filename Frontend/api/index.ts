@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import { readAccessToken, readAccessTokenExpiryTime } from "../clientUtils";
+import { readAccessToken, readAccessTokenExpiryTime } from "../TokenAccessObject";
 const { apiRoutes } = require("../apiRoutes");
 import AuthApi from "./auth";
 

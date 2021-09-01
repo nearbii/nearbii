@@ -20,7 +20,6 @@ export default function Post(props: IProps) {
     setDisplayScore(score + 1);
     PostApi.votePostUp(id)
       .then((res) => {
-        console.log(res.data.message);
         refreshPosts();
       })
       .catch((err) => console.log(err));
@@ -30,7 +29,6 @@ export default function Post(props: IProps) {
     setDisplayScore(score - 1);
     PostApi.votePostDown(id)
       .then((res) => {
-        console.log(res.data.message);
         refreshPosts();
       })
       .catch((err) => console.log(err));

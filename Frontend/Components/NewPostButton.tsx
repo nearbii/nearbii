@@ -4,9 +4,10 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 
 interface INewPostButtonProps {
   size: number;
+  onPress: () => void;
 }
 
-export default function NewPostButton({ size }: INewPostButtonProps) {
+export default function NewPostButton({ size, onPress }: INewPostButtonProps) {
   const styles = StyleSheet.create({
     newPost: {
       color: "white",
@@ -16,20 +17,15 @@ export default function NewPostButton({ size }: INewPostButtonProps) {
       alignSelf: "flex-end",
       padding: "2%",
       position: "absolute",
-      bottom: 20,
-      right: 20,
+      bottom: 0,
+      right: 30,
     },
     buttonBackground: {},
   });
 
   return (
-    <TouchableOpacity style={styles.buttonBackground}>
-      <MaterialIcons
-        borderRadius={100}
-        name="create"
-        style={styles.newPost}
-        size={size}
-      />
+    <TouchableOpacity style={styles.buttonBackground} onPress={onPress}>
+      <MaterialIcons name="create" style={styles.newPost} size={size} />
     </TouchableOpacity>
   );
 }

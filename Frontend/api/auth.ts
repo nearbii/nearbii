@@ -2,11 +2,10 @@ const { apiRoutes } = require("../apiRoutes");
 import { AxiosResponse } from "axios";
 import BaseApi from ".";
 import {
-  readAccessToken,
   readRefreshToken,
   storeAccessToken,
   storeAccessTokenExpiryTime,
-} from "../clientUtils";
+} from "../TokenAccessObject";
 
 export default class AuthApi extends BaseApi {
   constructor() {
