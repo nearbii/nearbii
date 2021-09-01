@@ -4,7 +4,7 @@ import AuthAPI from "./auth";
 import TokenAPI from "./tokens";
 
 //change to your local ip
-const HOST = process.env.HOST || "http://127.0.0.1";
+const HOST = process.env.HOST || "http://192.168.1.16";
 const PORT = process.env.PORT || 5000;
 
 interface IConfig {

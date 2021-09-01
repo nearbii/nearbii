@@ -25,6 +25,7 @@ module.exports.Post = class Post {
 	}
 
 	voteUp(voterUsername) {
+		console.log(voterUsername)
 		if (this.author === voterUsername || this.upVoters.includes(voterUsername)) return null
 		else {
 			if (this.downVoters.includes(voterUsername)) {

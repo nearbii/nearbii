@@ -10,6 +10,7 @@ import {
   TextInput,
 } from "react-native";
 import { AuthContext } from "../Auth";
+import { AxiosError } from "axios";
 
 export interface IauthLoginResp {
   message: string;
@@ -32,9 +33,9 @@ export default function Login() {
           history.push("/test");
         }
       })
-      .catch((err: any) => {
+      .catch((err: AxiosError) => {
         console.log(err);
-        if (err.response.status === 403) {
+        if (err.response && err.response.status === 403) {
           alert(err.response.data.message);
         }
       });
