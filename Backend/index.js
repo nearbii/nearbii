@@ -5,7 +5,6 @@ const express = require("express"),
   { apiRoutes } = require("./apiRoutes.ts"),
   { Post } = require("./classes.js");
 const app = express();
-<<<<<<< HEAD
 const cors = require("cors");
 const { tokenCreater, verifyAccessToken } = require("./jwt");
 const { formatUser, insertUserIntoDb, getUserFromDb } = require("./user");
@@ -13,17 +12,8 @@ const { formatUser, insertUserIntoDb, getUserFromDb } = require("./user");
 const { validateToken } = require("./Middleware/Authentication/index.ts");
 const { encryptPassword } = require("./utils");
 const pipe = require("ramda/src/pipe");
+const { isInRadius } = require("./backendUtils.js");
 
-=======
-const cors = require('cors');
-const {
-	isInRadius,
-} = require("./backendUtils.js");
-//CUSTOM
-const {
-	validateToken
-} = require('./Middleware/Authentication/index.ts');
->>>>>>> 8e5d05042ba7dd8789cf850170c1afdef8887424
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -43,7 +33,6 @@ const TOKENLENGTHSECONDS = process.env.TOKENLENGTHSECONDS || 15;
 const DISTANCERADIUS = process.env.DISTANCERADIUS || 5;
 const MAXLENGTH = process.env.POSTMAXLENGTH || 40;
 
-//TODO: use arrow functions for callbacks
 app.post(apiRoutes.register, async (req, res) => {
   const { username, password } = req.body;
   // check for existing user
@@ -110,105 +99,123 @@ app.delete(apiRoutes.logout, function (req, res) {
 const posts = [];
 
 app.post(apiRoutes.post, validateToken, function (req, res) {
-	if (req.body.text.length > MAXLENGTH) {
-		res.status(413).json({
-			message: `Post exceeds character limit of ${MAXLENGTH}!`
-		});
-		return
-	}
-	if (req.body.text.length === 0) {
-		res.status(404).json({
-			message: 'Post cannot be empty!'
-		});
-		return
-	}
-	const post = new Post(req.body.text, req.user.username, req.body.location.coords);
-	posts.push(post);
-	res.status(200).json({
-		message: 'Post created!'
-	});
+  if (req.body.text.length > MAXLENGTH) {
+    res.status(413).json({
+      message: `Post exceeds character limit of ${MAXLENGTH}!`,
+    });
+    return;
+  }
+  if (req.body.text.length === 0) {
+    res.status(404).json({
+      message: "Post cannot be empty!",
+    });
+    return;
+  }
+  const post = new Post(
+    req.body.text,
+    req.user.username,
+    req.body.location.coords
+  );
+  posts.push(post);
+  res.status(200).json({
+    message: "Post created!",
+  });
 });
 
 app.post(apiRoutes.getPosts, validateToken, function (req, res) {
-	const {
-		latitude,
-		longitude
-	} = req.body.location.coords
+  const { latitude, longitude } = req.body.location.coords;
 
-	const postsInRadius = posts.filter(post => isInRadius(post.location, {
-		latitude,
-		longitude
-	}, DISTANCERADIUS))
+  const postsInRadius = posts.filter((post) =>
+    isInRadius(
+      post.location,
+      {
+        latitude,
+        longitude,
+      },
+      DISTANCERADIUS
+    )
+  );
 
-	const postsWithHiddenVoters = postsInRadius.map(post => post.withoutVoters())
+  const postsWithHiddenVoters = postsInRadius.map((post) =>
+    post.withoutVoters()
+  );
 
-	const sortedPosts = postsWithHiddenVoters.sort((postA, postB) => postB.date - postA.date)
+  const sortedPosts = postsWithHiddenVoters.sort(
+    (postA, postB) => postB.date - postA.date
+  );
 
-	res.status(200).json({
-		message: `Successfully got ${posts.length} posts!`,
-		posts: sortedPosts
-	});
+  res.status(200).json({
+    message: `Successfully got ${posts.length} posts!`,
+    posts: sortedPosts,
+  });
 });
 
 app.post(apiRoutes.votePostUp, validateToken, function (req, res) {
-	const postID = req.body.postID
-	const post = posts.find(post => post.id === postID)
+  const postID = req.body.postID;
+  const post = posts.find((post) => post.id === postID);
 
-	if (!post) {
-		//TODO: check http status code
-		res.status(400).json({
-			message: `Can't vote, post with ID ${post.id} couldn't be found!`,
-			post: null
-		});
-		return
-	}
+  if (!post) {
+    //TODO: check http status code
+    res.status(400).json({
+      message: `Can't vote, post with ID ${post.id} couldn't be found!`,
+      post: null,
+    });
+    return;
+  }
 
-	const vote = post.voteUp(req.user.username);
+  const vote = post.voteUp(req.user.username);
 
-	if (vote === null) {
-		//TODO: check http status code
-		res.status(400).json({
-			message: `Can't vote, ${post.author===req.user ? 'you are the post author!' : 'you have already voted!'}`,
-			post: post.withoutVoters()
-		});
-		return
-	}
+  if (vote === null) {
+    //TODO: check http status code
+    res.status(400).json({
+      message: `Can't vote, ${
+        post.author === req.user
+          ? "you are the post author!"
+          : "you have already voted!"
+      }`,
+      post: post.withoutVoters(),
+    });
+    return;
+  }
 
-	res.status(200).json({
-		message: `Post votes increased to ${post.score}!`,
-		post: post.withoutVoters()
-	});
+  res.status(200).json({
+    message: `Post votes increased to ${post.score}!`,
+    post: post.withoutVoters(),
+  });
 });
 
 app.post(apiRoutes.votePostDown, validateToken, function (req, res) {
+  const postID = req.body.postID;
+  const post = posts.find((post) => post.id === postID);
 
-	const postID = req.body.postID
-	const post = posts.find(post => post.id === postID)
+  if (!post) {
+    //TODO: check http status code
+    res.status(400).json({
+      message: `Can't vote, post with ID ${post.id} couldn't be found!`,
+      post: null,
+    });
+    return;
+  }
 
-	if (!post) {
-		//TODO: check http status code
-		res.status(400).json({
-			message: `Can't vote, post with ID ${post.id} couldn't be found!`,
-			post: null
-		});
-		return
-	}
+  const vote = post.voteDown(req.user.username);
 
-	const vote = post.voteDown(req.user.username);
+  if (vote === null) {
+    //TODO: check http status code
+    res.status(400).json({
+      message: `Can't vote, ${
+        post.author === req.user
+          ? "you are the post author!"
+          : "you have already voted!"
+      }`,
+      post: post.withoutVoters(),
+    });
+    return;
+  }
 
-	if (vote === null) {
-		//TODO: check http status code
-		res.status(400).json({
-			message: `Can't vote, ${post.author===req.user ? 'you are the post author!' : 'you have already voted!'}`,
-			post: post.withoutVoters()
-		});
-		return
-	}
-
-	res.status(200).json({
-		message: `Post votes decreased to ${post.score}!`,
-		post: post.withoutVoters()
-	});
+  res.status(200).json({
+    message: `Post votes decreased to ${post.score}!`,
+    post: post.withoutVoters(),
+  });
 });
 
 const refreshTokens = [];
