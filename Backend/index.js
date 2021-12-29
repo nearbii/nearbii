@@ -6,7 +6,7 @@ const express = require("express"),
   { Post } = require("./classes.js");
 const app = express();
 const cors = require("cors");
-const { tokenCreater } = require("./login");
+const { tokenCreater, verifyToken } = require("./jwt");
 const { formatUser } = require("./user");
 //CUSTOM
 const { validateToken } = require("./Middleware/Authentication/index.ts");
@@ -50,23 +50,25 @@ app.post(apiRoutes.register, function (req, res) {
   }
 });
 
-app.post(apiRoutes.login, function (req, res) {
+app.post(apiRoutes.login, (req, res) => {
   //TODO: authenticate user properly!
   const user = users.find(
     (user) =>
       user.username === req.body.username && user.password === req.body.password
   );
   if (user) {
+    // get tokens
     const formattedToken = pipe(formatUser, tokenCreater)(user);
     const accessToken = formattedToken(ACCESS_TOKEN_SECRETKEY)(
       TOKENLENGTHSECONDS
     );
     const refreshToken = formattedToken(REFRESH_TOKEN_SECRETKEY)(6000);
-    // TODO: move to login file
+    // get expiry
     const expiresAt =
-      jwt.verify(accessToken, ACCESS_TOKEN_SECRETKEY).exp * 1000;
+      verifyToken(accessToken)(ACCESS_TOKEN_SECRETKEY).exp * 1000;
     // TODO: remove to real db
     refreshTokens.push(refreshToken);
+    // response
     res.status(200).json({
       message: `Successfuly logged '${user.username}' in!`,
       accessToken,
