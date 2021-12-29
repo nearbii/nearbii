@@ -6,7 +6,7 @@ const express = require("express"),
   { Post } = require("./classes.js");
 const app = express();
 const cors = require("cors");
-const { generateAccessToken, generateRefreshToken } = require("./login");
+const { tokenCreater } = require("./login");
 const { formatUser } = require("./user");
 //CUSTOM
 const { validateToken } = require("./Middleware/Authentication/index.ts");
@@ -57,8 +57,11 @@ app.post(apiRoutes.login, function (req, res) {
       user.username === req.body.username && user.password === req.body.password
   );
   if (user) {
-    const accessToken = pipe(formatUser, generateAccessToken)(user);
-    const refreshToken = pipe(formatUser, generateRefreshToken)(user);
+    const formattedToken = pipe(formatUser, tokenCreater)(user);
+    const accessToken = formattedToken(ACCESS_TOKEN_SECRETKEY)(
+      TOKENLENGTHSECONDS
+    );
+    const refreshToken = formattedToken(REFRESH_TOKEN_SECRETKEY)(6000);
     // TODO: move to login file
     const expiresAt =
       jwt.verify(accessToken, ACCESS_TOKEN_SECRETKEY).exp * 1000;
