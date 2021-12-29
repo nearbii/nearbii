@@ -11,8 +11,13 @@ const express = require("express"),
 
 const app = express();
 const cors = require('cors');
+const {
+	isInRadius,
+} = require("./backendUtils.js");
 //CUSTOM
-const {validateToken} = require('./Middleware/Authentication/index.ts');
+const {
+	validateToken
+} = require('./Middleware/Authentication/index.ts');
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -24,7 +29,10 @@ const users = [{
 //TODO: move to env file
 const ACCESS_TOKEN_SECRETKEY = process.env.ACCESS_TOKEN_SECRETKEY || 'accesssecretkey';
 const REFRESH_TOKEN_SECRETKEY = process.env.REFRESH_TOKEN_SECRETKEY || 'refreshsecretkey';
-const TOKENLENGTHSECONDS = process.env.TOKENLENGTHSECONDS || 15;
+const TOKENLENGTHSECONDS = process.env.TOKENLENGTHSECONDS || 30 * 60;
+//in km
+const DISTANCERADIUS = process.env.DISTANCERADIUS || 5;
+const MAXLENGTH = process.env.POSTMAXLENGTH || 40;
 
 //TODO: use arrow functions for callbacks
 app.post(apiRoutes.register, function (req, res) {
@@ -80,10 +88,104 @@ app.delete(apiRoutes.logout, function (req, res) {
 const posts = [];
 
 app.post(apiRoutes.post, validateToken, function (req, res) {
-	const post = new Post(req.body.text, req.user.username);
+	if (req.body.text.length > MAXLENGTH) {
+		res.status(413).json({
+			message: `Post exceeds character limit of ${MAXLENGTH}!`
+		});
+		return
+	}
+	if (req.body.text.length === 0) {
+		res.status(404).json({
+			message: 'Post cannot be empty!'
+		});
+		return
+	}
+	const post = new Post(req.body.text, req.user.username, req.body.location.coords);
 	posts.push(post);
 	res.status(200).json({
 		message: 'Post created!'
+	});
+});
+
+app.post(apiRoutes.getPosts, validateToken, function (req, res) {
+	const {
+		latitude,
+		longitude
+	} = req.body.location.coords
+
+	const postsInRadius = posts.filter(post => isInRadius(post.location, {
+		latitude,
+		longitude
+	}, DISTANCERADIUS))
+
+	const postsWithHiddenVoters = postsInRadius.map(post => post.withoutVoters())
+
+	const sortedPosts = postsWithHiddenVoters.sort((postA, postB) => postB.date - postA.date)
+
+	res.status(200).json({
+		message: `Successfully got ${posts.length} posts!`,
+		posts: sortedPosts
+	});
+});
+
+app.post(apiRoutes.votePostUp, validateToken, function (req, res) {
+	const postID = req.body.postID
+	const post = posts.find(post => post.id === postID)
+
+	if (!post) {
+		//TODO: check http status code
+		res.status(400).json({
+			message: `Can't vote, post with ID ${post.id} couldn't be found!`,
+			post: null
+		});
+		return
+	}
+
+	const vote = post.voteUp(req.user.username);
+
+	if (vote === null) {
+		//TODO: check http status code
+		res.status(400).json({
+			message: `Can't vote, ${post.author===req.user ? 'you are the post author!' : 'you have already voted!'}`,
+			post: post.withoutVoters()
+		});
+		return
+	}
+
+	res.status(200).json({
+		message: `Post votes increased to ${post.score}!`,
+		post: post.withoutVoters()
+	});
+});
+
+app.post(apiRoutes.votePostDown, validateToken, function (req, res) {
+
+	const postID = req.body.postID
+	const post = posts.find(post => post.id === postID)
+
+	if (!post) {
+		//TODO: check http status code
+		res.status(400).json({
+			message: `Can't vote, post with ID ${post.id} couldn't be found!`,
+			post: null
+		});
+		return
+	}
+
+	const vote = post.voteDown(req.user.username);
+
+	if (vote === null) {
+		//TODO: check http status code
+		res.status(400).json({
+			message: `Can't vote, ${post.author===req.user ? 'you are the post author!' : 'you have already voted!'}`,
+			post: post.withoutVoters()
+		});
+		return
+	}
+
+	res.status(200).json({
+		message: `Post votes decreased to ${post.score}!`,
+		post: post.withoutVoters()
 	});
 });
 
