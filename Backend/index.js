@@ -7,10 +7,12 @@ const express = require("express"),
 const app = express();
 const cors = require("cors");
 const { tokenCreater, verifyAccessToken } = require("./jwt");
-const { formatUser } = require("./user");
+const { formatUser, insertUserIntoDb, getUserFromDb } = require("./user");
 //CUSTOM
 const { validateToken } = require("./Middleware/Authentication/index.ts");
+const { encryptPassword } = require("./utils");
 const pipe = require("ramda/src/pipe");
+
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -29,24 +31,29 @@ const REFRESH_TOKEN_SECRETKEY =
 const TOKENLENGTHSECONDS = process.env.TOKENLENGTHSECONDS || 15;
 
 //TODO: use arrow functions for callbacks
-app.post(apiRoutes.register, function (req, res) {
-  const existingUser = users.find(
-    (user) => user.username === req.body.username
-  );
+app.post(apiRoutes.register, async (req, res) => {
+  const { username, password } = req.body;
+  // check for existing user
+  const existingUser = await getUserFromDb(username);
   if (existingUser) {
-    res.status(409).json({
+    return res.status(409).json({
       message: `User '${existingUser.username}' already exists!`,
     });
-  } else {
-    const newUser = {
-      username: req.body.username,
-      password: req.body.password,
-    };
-    users.push(newUser);
+  }
+  // add user to the db and return success
+  const encryptedPassword = await encryptPassword(password);
+  const user = await insertUserIntoDb({
+    username,
+    password: encryptedPassword,
+  });
+
+  if (!!user) {
     res.status(200).json({
       message: `Successfully registered '${req.body.username}'!`,
-      user: newUser,
+      user: formatUser(user),
     });
+  } else {
+    // handle error adding to db
   }
 });
 
