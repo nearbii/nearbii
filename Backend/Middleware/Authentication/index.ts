@@ -1,7 +1,4 @@
-const { verifyToken } = require("../../jwt");
-
-const ACCESS_TOKEN_SECRETKEY =
-  process.env.ACCESS_TOKEN_SECRETKEY || "accesssecretkey";
+const { verifyAccessToken } = require("../../jwt");
 
 const validateToken = (req, res, next) => {
   //get authorisation header value
@@ -12,7 +9,7 @@ const validateToken = (req, res, next) => {
     //token is of form 'bearer <tokenvalue>' so separate
     const token = bearerHeader.split(" ")[1];
     // returns userObject or false
-    const userData = verifyToken(token)(ACCESS_TOKEN_SECRETKEY);
+    const userData = verifyAccessToken(token);
     if (!!userData) {
       req.user = userData;
       next();

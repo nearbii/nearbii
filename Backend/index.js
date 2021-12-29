@@ -6,7 +6,7 @@ const express = require("express"),
   { Post } = require("./classes.js");
 const app = express();
 const cors = require("cors");
-const { tokenCreater, verifyToken } = require("./jwt");
+const { tokenCreater, verifyAccessToken } = require("./jwt");
 const { formatUser } = require("./user");
 //CUSTOM
 const { validateToken } = require("./Middleware/Authentication/index.ts");
@@ -64,8 +64,7 @@ app.post(apiRoutes.login, (req, res) => {
     );
     const refreshToken = formattedToken(REFRESH_TOKEN_SECRETKEY)(6000);
     // get expiry
-    const expiresAt =
-      verifyToken(accessToken)(ACCESS_TOKEN_SECRETKEY).exp * 1000;
+    const expiresAt = verifyAccessToken(accessToken).exp * 1000;
     // TODO: remove to real db
     refreshTokens.push(refreshToken);
     // response
