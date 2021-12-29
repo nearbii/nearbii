@@ -115,22 +115,6 @@ app.post(apiRoutes.token, function (req, res) {
   });
 });
 
-// function generateAccessToken(user) {
-//   const returnUser = {
-//     ...user,
-//   };
-//   if (returnUser.password) delete returnUser.password;
-//   return jwt.sign(
-//     {
-//       user: returnUser,
-//     },
-//     ACCESS_TOKEN_SECRETKEY,
-//     {
-//       expiresIn: TOKENLENGTHSECONDS,
-//     }
-//   );
-// }
-
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => console.log(`App listening on port ${PORT}`));
