@@ -1,10 +1,10 @@
 import axios, { AxiosResponse } from "axios";
-import { readAccessToken, readAccessTokenExpiryTime } from "../clientUtils";
 const { apiRoutes } = require("../apiRoutes");
-import AuthApi from "./auth";
+import AuthAPI from "./auth";
+import TokenAPI from "./tokens";
 
 //change to your local ip
-const HOST = process.env.HOST || "http://192.168.0.6";
+const HOST = process.env.HOST || "http://192.168.1.16";
 const PORT = process.env.PORT || 5000;
 
 interface IConfig {
@@ -14,24 +14,26 @@ interface IConfig {
 //get new access token if it expires
 axios.interceptors.request.use(
   async (config) => {
-    const timeNow = new Date().getTime();
-
     config.headers = {
       "content-type": "application/json",
-      Authorization: `Bearer ${await readAccessToken()}`,
+      Authorization: `Bearer ${await TokenAPI.readAccessToken()}`,
     };
 
     if (config.url?.includes(apiRoutes.token)) {
       return config;
     }
 
-    return await readAccessTokenExpiryTime()
+    const timeNow = new Date().getTime();
+
+    return await TokenAPI.readAccessTokenExpiryTime()
       .then((expiryTime) => {
         if (timeNow > expiryTime) {
-          return AuthApi.updateAccessToken().then(async (data) => {
-            config.headers.Authorization = `Bearer ${data.accessToken}`;
-            return config;
-          });
+          return AuthAPI.updateAccessToken()
+            .then(async (data) => {
+              config.headers.Authorization = `Bearer ${data.accessToken}`;
+              return config;
+            })
+            .catch((err) => console.log(err));
         }
       })
       .then((newConf) => {

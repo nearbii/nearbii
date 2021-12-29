@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "nearbi",
-    "slug": "nearbi",
+    "name": "nearbii",
+    "slug": "nearbii",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -17,7 +17,11 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Allow Nearbii to access your device's location",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Allow Nearbii to access your device's location"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -29,9 +33,13 @@
       "favicon": "./assets/favicon.png",
       "build": {
         "babel": {
-          "include": ["react-router-native"]
+          "include": [
+            "react-router-native"
+          ]
         }
       }
-    }
+    },
+    "description": "An early stage development social media project, involving anonymous posts that are accessible based on location.",
+    "githubUrl": "https://github.com/nearbii/nearbii"
   }
 }
