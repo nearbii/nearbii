@@ -1,6 +1,6 @@
 const { pipe } = require("ramda");
 const { PrismaClient } = require("@prisma/client");
-const { add5daysToDate } = require("./date");
+const { add5daysToDate, getTodaysDate } = require("./date");
 const prisma = new PrismaClient();
 
 // user util functions
@@ -39,7 +39,7 @@ const insertRefreshToken = async (token) => {
   return prisma.refreshToken.create({
     data: {
       token,
-      expiry: add5daysToDate(new Date()),
+      expiry: add5daysToDate(getTodaysDate()),
     },
   });
 };
