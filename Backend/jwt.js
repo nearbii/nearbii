@@ -4,6 +4,18 @@ const ACCESS_TOKEN_SECRETKEY =
 const REFRESH_TOKEN_SECRETKEY =
   process.env.REFRESH_TOKEN_SECRETKEY || "refreshsecretkey";
 
+const { TokenExpiredError } = jwt;
+
+const catchError = (err, res) => {
+  if (err instanceof TokenExpiredError) {
+    return res
+      .status(401)
+      .send({ message: "Unauthorized! Access Token was expired!" });
+  }
+
+  return res.sendStatus(401).send({ message: "Unauthorized!" });
+};
+
 const tokenCreater = (user) => (secretKey) => (expirySeconds) => {
   return jwt.sign(
     {
@@ -29,4 +41,5 @@ module.exports = {
   tokenCreater,
   verifyAccessToken,
   verifyRefreshToken,
+  catchError,
 };

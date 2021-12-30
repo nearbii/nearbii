@@ -8,9 +8,10 @@ const app = express();
 const cors = require("cors");
 const { tokenCreater, verifyAccessToken } = require("./jwt");
 const { formatUser, insertUserIntoDb, getUserFromDb } = require("./user");
+const { errorResponseCreator } = require("./utils");
 //CUSTOM
 const { validateToken } = require("./Middleware/Authentication/index.ts");
-const { encryptPassword } = require("./utils");
+const { encryptPassword, comparePasswords } = require("./utils");
 const pipe = require("ramda/src/pipe");
 const { isInRadius } = require("./backendUtils.js");
 
@@ -37,10 +38,10 @@ app.post(apiRoutes.register, async (req, res) => {
   const { username, password } = req.body;
   // check for existing user
   const existingUser = await getUserFromDb(username);
+  const response409 = errorResponseCreator(res)(409);
+  const response400 = errorResponseCreator(res)(400);
   if (existingUser) {
-    return res.status(409).json({
-      message: `User '${existingUser.username}' already exists!`,
-    });
+    response409(`User '${existingUser.username}' already exists!`);
   }
   // add user to the db and return success
   const encryptedPassword = await encryptPassword(password);
@@ -55,17 +56,25 @@ app.post(apiRoutes.register, async (req, res) => {
       user: formatUser(user),
     });
   } else {
-    // handle error adding to db
+    // Failed to add user to the db
+    return response400("Failed to register user");
   }
 });
 
-app.post(apiRoutes.login, (req, res) => {
-  //TODO: authenticate user properly!
-  const user = users.find(
-    (user) =>
-      user.username === req.body.username && user.password === req.body.password
-  );
-  if (user) {
+app.post(apiRoutes.login, async (req, res) => {
+  const { username, password } = req.body;
+  const user = await getUserFromDb(username);
+  const response403 = errorResponseCreator(res)(403);
+  if (!user) {
+    // user does not exist
+    return response403(`Could not authorise credentials.`);
+  }
+  // check password and username
+  const { password: hash, username: dbUsername } = user;
+  const passwordMatch = await comparePasswords(hash, password);
+  const usernameMatch = dbUsername === username;
+
+  if (passwordMatch && usernameMatch) {
     // get tokens
     const formattedToken = pipe(formatUser, tokenCreater)(user);
     const accessToken = formattedToken(ACCESS_TOKEN_SECRETKEY)(
@@ -84,9 +93,8 @@ app.post(apiRoutes.login, (req, res) => {
       expiresAt,
     });
   } else {
-    res.status(403).json({
-      message: `Could not authorise credentials.`,
-    });
+    // password does not match
+    return response403(`Could not authorise credentials.`);
   }
 });
 
