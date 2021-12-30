@@ -33,7 +33,7 @@ router.post(register, async (req, res) => {
   // check for existing user
   const existingUser = await getUserFromDb(username);
   if (existingUser) {
-    response409(`User '${existingUser.username}' already exists!`);
+    response409({ message: `User '${existingUser.username}' already exists!` });
   }
   // add user to the db and return success
   const encryptedPassword = await encryptPassword(password);
@@ -49,7 +49,7 @@ router.post(register, async (req, res) => {
     });
   } else {
     // Failed to add user to the db
-    return response400("Failed to register user");
+    return response400({ message: "Failed to register user" });
   }
 });
 
@@ -61,7 +61,7 @@ router.post(login, async (req, res) => {
   const response200 = response(200);
   if (!user) {
     // user does not exist
-    return response403(`Could not authorise credentials`);
+    return response403({ message: `Could not authorise credentials` });
   }
   // check password and username
   const { password: hash, username: dbUsername } = user;
@@ -87,7 +87,7 @@ router.post(login, async (req, res) => {
     });
   } else {
     // password does not match
-    return response403(`Could not authorise credentials.`);
+    return response403({ message: `Could not authorise credentials.` });
   }
 });
 
@@ -99,21 +99,21 @@ router.post(token, async (req, res) => {
   const { refreshToken } = req.body;
   //if the token wasnt sent, return 401
   if (!refreshToken)
-    return response401("refresh token does not exist in request");
+    return response401({ message: "refresh token does not exist in request" });
   //if the token doesnt exist in our store
   const token = await getRefreshTokenFromDb(refreshToken);
   // error if token does not exist in db
-  if (!token) return response403("refresh token does not exist");
+  if (!token) return response403({ message: "refresh token does not exist" });
   // check expiry date is greater than today
   if (toDateFormat(token.expiry) < getTodaysDate()) {
     // delete token from db
     await deleteRefreshToken(token);
     // return 403 to user
-    return response403("token has expired");
+    return response403({ message: "token has expired" });
   }
   // verify token on success
   verifyRefreshToken(refreshToken)((err, tokenData) => {
-    if (err) return res.sendStatus(403);
+    if (err) return response403();
     const formattedToken = pipe(formatUser, tokenCreater)(tokenData);
     const accessToken = formattedToken(ACCESS_TOKEN_SECRETKEY)(
       TOKENLENGTHSECONDS
@@ -133,7 +133,7 @@ router.delete(logout, async (req, res) => {
   const response204 = response(204);
   // remove token from db
   await deleteRefreshToken(token);
-  response204("Succesfully logged out");
+  response204({ message: "Succesfully logged out" });
 });
 
 module.exports = router;
