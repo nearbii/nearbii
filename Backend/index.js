@@ -18,14 +18,10 @@ const { isInRadius } = require("./backendUtils.js");
 app.use(bodyParser.json());
 app.use(cors());
 
-const users = [
-  {
-    username: "q",
-    password: "q",
-  },
-];
+const refreshTokens = [];
 
 //TODO: move to env file
+
 const ACCESS_TOKEN_SECRETKEY =
   process.env.ACCESS_TOKEN_SECRETKEY || "accesssecretkey";
 const REFRESH_TOKEN_SECRETKEY =
@@ -33,6 +29,8 @@ const REFRESH_TOKEN_SECRETKEY =
 const TOKENLENGTHSECONDS = process.env.TOKENLENGTHSECONDS || 15;
 const DISTANCERADIUS = process.env.DISTANCERADIUS || 5;
 const MAXLENGTH = process.env.POSTMAXLENGTH || 40;
+
+//TODO: move to seperate files eg. auth, posts, etc etc
 
 app.post(apiRoutes.register, async (req, res) => {
   const { username, password } = req.body;
@@ -96,6 +94,28 @@ app.post(apiRoutes.login, async (req, res) => {
     // password does not match
     return response403(`Could not authorise credentials.`);
   }
+});
+
+app.post(apiRoutes.token, function (req, res) {
+  //TODO: use database
+  const refreshToken = req.body.refreshToken;
+  //if the token wasnt sent, return 401
+  if (!refreshToken) return res.sendStatus(401);
+  //if the token doesnt exist in our store
+  if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
+
+  jwt.verify(refreshToken, REFRESH_TOKEN_SECRETKEY, (err, tokenData) => {
+    if (err) return res.sendStatus(403);
+    const formattedToken = pipe(formatUser, tokenCreater)(tokenData);
+    const accessToken = formattedToken(ACCESS_TOKEN_SECRETKEY)(
+      TOKENLENGTHSECONDS
+    );
+    const expiresAt = verifyAccessToken(accessToken).exp * 1000;
+    res.status(200).json({
+      accessToken,
+      expiresAt,
+    });
+  });
 });
 
 app.delete(apiRoutes.logout, function (req, res) {
@@ -223,30 +243,6 @@ app.post(apiRoutes.votePostDown, validateToken, function (req, res) {
   res.status(200).json({
     message: `Post votes decreased to ${post.score}!`,
     post: post.withoutVoters(),
-  });
-});
-
-const refreshTokens = [];
-
-app.post(apiRoutes.token, function (req, res) {
-  //TODO: use database
-  const refreshToken = req.body.refreshToken;
-  //if the token wasnt sent, return 401
-  if (!refreshToken) return res.sendStatus(401);
-  //if the token doesnt exist in our store
-  if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
-
-  jwt.verify(refreshToken, REFRESH_TOKEN_SECRETKEY, (err, tokenData) => {
-    if (err) return res.sendStatus(403);
-    const formattedToken = pipe(formatUser, tokenCreater)(tokenData);
-    const accessToken = formattedToken(ACCESS_TOKEN_SECRETKEY)(
-      TOKENLENGTHSECONDS
-    );
-    const expiresAt = verifyAccessToken(accessToken).exp * 1000;
-    res.status(200).json({
-      accessToken,
-      expiresAt,
-    });
   });
 });
 
