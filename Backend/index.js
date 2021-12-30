@@ -7,13 +7,21 @@ const express = require("express"),
 const app = express();
 const cors = require("cors");
 const { tokenCreater, verifyAccessToken } = require("./jwt");
-const { formatUser, insertUserIntoDb, getUserFromDb } = require("./user");
+const {
+  formatUser,
+  insertUserIntoDb,
+  getUserFromDb,
+  insertRefreshToken,
+  getRefreshTokenFromDb,
+  deleteRefreshToken,
+} = require("./user");
 const { responseCreator } = require("./utils");
 //CUSTOM
 const { validateToken } = require("./Middleware/Authentication/index.ts");
 const { encryptPassword, comparePasswords } = require("./utils");
 const pipe = require("ramda/src/pipe");
 const { isInRadius } = require("./backendUtils.js");
+const { toDateFormat, getTodaysDate } = require("./date");
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -85,8 +93,8 @@ app.post(apiRoutes.login, async (req, res) => {
     const refreshToken = formattedToken(REFRESH_TOKEN_SECRETKEY)(6000);
     // get expiry
     const expiresAt = verifyAccessToken(accessToken).exp * 1000;
-    // TODO: remove to real db
-    refreshTokens.push(refreshToken);
+    // insert refresh token into db
+    await insertRefreshToken(refreshToken);
     // response
     return response200({
       message: `Successfuly logged '${user.username}' in!`,
@@ -100,14 +108,27 @@ app.post(apiRoutes.login, async (req, res) => {
   }
 });
 
-app.post(apiRoutes.token, (req, res) => {
+app.post(apiRoutes.token, async (req, res) => {
+  const response = responseCreator(res);
+  const response401 = response(401);
+  const response403 = response(403);
+  const response200 = response(200);
   //TODO: use database
-  const refreshToken = req.body.refreshToken;
+  const { refreshToken } = req.body;
   //if the token wasnt sent, return 401
-  if (!refreshToken) return res.sendStatus(401);
+  if (!refreshToken) return response401("error");
   //if the token doesnt exist in our store
-  if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
-
+  const token = await getRefreshTokenFromDb(refreshToken);
+  // error if token does not exist in db
+  if (!token) return response403("error");
+  // check expiry date is greater than today
+  if (toDateFormat(token.expiry) < getTodaysDate()) {
+    // delete token from db
+    await deleteRefreshToken(token);
+    // return 403 to user
+    return response403("token expired");
+  }
+  // verify token on success
   jwt.verify(refreshToken, REFRESH_TOKEN_SECRETKEY, (err, tokenData) => {
     if (err) return res.sendStatus(403);
     const formattedToken = pipe(formatUser, tokenCreater)(tokenData);
@@ -115,7 +136,7 @@ app.post(apiRoutes.token, (req, res) => {
       TOKENLENGTHSECONDS
     );
     const expiresAt = verifyAccessToken(accessToken).exp * 1000;
-    res.status(200).json({
+    return response200({
       accessToken,
       expiresAt,
     });
