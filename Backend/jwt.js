@@ -28,11 +28,8 @@ const tokenCreater = (user) => (secretKey) => (expirySeconds) => {
   );
 };
 
-const verifyToken = (secretKey) => (token) =>
-  jwt.verify(token, secretKey, (err, tokenData) => {
-    if (!err) return tokenData;
-    return false;
-  });
+const verifyToken = (secretKey) => (token) => (handler) =>
+  jwt.verify(token, secretKey, handler);
 
 const verifyAccessToken = verifyToken(ACCESS_TOKEN_SECRETKEY);
 const verifyRefreshToken = verifyToken(REFRESH_TOKEN_SECRETKEY);
