@@ -5,9 +5,7 @@ const saltRounds = 10;
 
 const encryptPassword = (password) => bcrypt.hash(password, saltRounds);
 
-const comparePasswords = (hash, password) => {
-  return bcrypt.compare(password, hash);
-};
+const comparePasswords = (hash, password) => bcrypt.compare(password, hash);
 
 // response utils
 
