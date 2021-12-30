@@ -96,7 +96,7 @@ app.post(apiRoutes.login, async (req, res) => {
   }
 });
 
-app.post(apiRoutes.token, function (req, res) {
+app.post(apiRoutes.token, (req, res) => {
   //TODO: use database
   const refreshToken = req.body.refreshToken;
   //if the token wasnt sent, return 401
@@ -118,7 +118,7 @@ app.post(apiRoutes.token, function (req, res) {
   });
 });
 
-app.delete(apiRoutes.logout, function (req, res) {
+app.delete(apiRoutes.logout, (req, res) => {
   //TODO: database it up
   refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
   res.sendStatus(204);
@@ -126,7 +126,9 @@ app.delete(apiRoutes.logout, function (req, res) {
 
 const posts = [];
 
-app.post(apiRoutes.post, validateToken, function (req, res) {
+//TODO: move the validate token to a different call prior to calling these endpoints
+
+app.post(apiRoutes.post, validateToken, (req, res) => {
   if (req.body.text.length > MAXLENGTH) {
     res.status(413).json({
       message: `Post exceeds character limit of ${MAXLENGTH}!`,
@@ -150,7 +152,7 @@ app.post(apiRoutes.post, validateToken, function (req, res) {
   });
 });
 
-app.post(apiRoutes.getPosts, validateToken, function (req, res) {
+app.post(apiRoutes.getPosts, validateToken, (req, res) => {
   const { latitude, longitude } = req.body.location.coords;
 
   const postsInRadius = posts.filter((post) =>
@@ -178,7 +180,7 @@ app.post(apiRoutes.getPosts, validateToken, function (req, res) {
   });
 });
 
-app.post(apiRoutes.votePostUp, validateToken, function (req, res) {
+app.post(apiRoutes.votePostUp, validateToken, (req, res) => {
   const postID = req.body.postID;
   const post = posts.find((post) => post.id === postID);
 
@@ -212,7 +214,7 @@ app.post(apiRoutes.votePostUp, validateToken, function (req, res) {
   });
 });
 
-app.post(apiRoutes.votePostDown, validateToken, function (req, res) {
+app.post(apiRoutes.votePostDown, validateToken, (req, res) => {
   const postID = req.body.postID;
   const post = posts.find((post) => post.id === postID);
 
