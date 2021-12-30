@@ -238,9 +238,11 @@ app.post(apiRoutes.token, function (req, res) {
 
   jwt.verify(refreshToken, REFRESH_TOKEN_SECRETKEY, (err, tokenData) => {
     if (err) return res.sendStatus(403);
-    const accessToken = generateAccessToken(tokenData);
-    const expiresAt =
-      jwt.verify(accessToken, ACCESS_TOKEN_SECRETKEY).exp * 1000;
+    const formattedToken = pipe(formatUser, tokenCreater)(tokenData);
+    const accessToken = formattedToken(ACCESS_TOKEN_SECRETKEY)(
+      TOKENLENGTHSECONDS
+    );
+    const expiresAt = verifyAccessToken(accessToken).exp * 1000;
     res.status(200).json({
       accessToken,
       expiresAt,
