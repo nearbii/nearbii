@@ -11,4 +11,4 @@ cd into Backend
 - install docker
 - run 'docker-compose up' to start the db
 - run 'npx prisma' to install prisma
-- run 'npx prisma migrate dev' to migrate db
+- run 'npx prisma migrate dev' to migrate tables
