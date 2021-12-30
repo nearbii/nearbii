@@ -8,7 +8,8 @@ The Backend is using Postgres with Prisma ORM
 
 cd into Backend
 
-- install docker
-- run 'docker-compose up' to start the db
-- run 'npx prisma' to install prisma
+- install Docker
+- install Prisma
+- run 'docker-compose up' to start the db in container
 - run 'npx prisma migrate dev' to migrate tables
+- run 'yarn start' to start the node express server
