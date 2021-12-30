@@ -8,7 +8,7 @@ const app = express();
 const cors = require("cors");
 const { tokenCreater, verifyAccessToken } = require("./jwt");
 const { formatUser, insertUserIntoDb, getUserFromDb } = require("./user");
-const { errorResponseCreator } = require("./utils");
+const { responseCreator } = require("./utils");
 //CUSTOM
 const { validateToken } = require("./Middleware/Authentication/index.ts");
 const { encryptPassword, comparePasswords } = require("./utils");
@@ -34,10 +34,12 @@ const MAXLENGTH = process.env.POSTMAXLENGTH || 40;
 
 app.post(apiRoutes.register, async (req, res) => {
   const { username, password } = req.body;
+  const response = responseCreator(res);
+  const response409 = response(409);
+  const response400 = response(400);
+  const response200 = response(200);
   // check for existing user
   const existingUser = await getUserFromDb(username);
-  const response409 = errorResponseCreator(res)(409);
-  const response400 = errorResponseCreator(res)(400);
   if (existingUser) {
     response409(`User '${existingUser.username}' already exists!`);
   }
@@ -49,7 +51,7 @@ app.post(apiRoutes.register, async (req, res) => {
   });
 
   if (!!user) {
-    res.status(200).json({
+    return response200({
       message: `Successfully registered '${req.body.username}'!`,
       user: formatUser(user),
     });
@@ -62,7 +64,9 @@ app.post(apiRoutes.register, async (req, res) => {
 app.post(apiRoutes.login, async (req, res) => {
   const { username, password } = req.body;
   const user = await getUserFromDb(username);
-  const response403 = errorResponseCreator(res)(403);
+  const response = responseCreator(res);
+  const response403 = response(403);
+  const response200 = response(200);
   if (!user) {
     // user does not exist
     return response403(`Could not authorise credentials.`);
@@ -84,7 +88,7 @@ app.post(apiRoutes.login, async (req, res) => {
     // TODO: remove to real db
     refreshTokens.push(refreshToken);
     // response
-    res.status(200).json({
+    return response200({
       message: `Successfuly logged '${user.username}' in!`,
       accessToken,
       refreshToken,

@@ -9,14 +9,12 @@ const comparePasswords = (hash, password) => bcrypt.compare(password, hash);
 
 // response utils
 
-const errorResponseCreator = (res) => (errorCode) => (message) => {
-  return res.status(errorCode).json({
-    message,
-  });
+const responseCreator = (res) => (errorCode) => (data) => {
+  return res.status(errorCode).json(data);
 };
 
 module.exports = {
   encryptPassword,
   comparePasswords,
-  errorResponseCreator,
+  responseCreator,
 };
