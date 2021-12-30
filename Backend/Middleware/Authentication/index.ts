@@ -12,7 +12,7 @@ const validateToken = (req, res, next) => {
     //token is of form 'bearer <tokenvalue>' so separate
     const token = bearerHeader.split(" ")[1];
     // returns userObject or false
-    const userData = verifyAccessToken(token)((err, tokenData) => {
+    verifyAccessToken(token)((err, tokenData) => {
       if (err) return response403("failed to authenticate");
       req.user = tokenData;
       next();
