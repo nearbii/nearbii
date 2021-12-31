@@ -44,7 +44,7 @@ router.post(register, async (req, res) => {
 
   if (!!user) {
     return response200({
-      message: `Successfully registered '${req.body.username}'!`,
+      message: `Successfully registered '${username}'!`,
       user: formatUser(user),
     });
   } else {
