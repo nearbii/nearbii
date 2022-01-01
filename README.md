@@ -12,4 +12,4 @@ cd into Backend
 - install Prisma
 - run 'docker-compose up' to start the db in container
 - run 'npx prisma migrate dev' to migrate tables
-- run 'yarn start' to start the node express server
+- run 'npm start' to start the node express server
