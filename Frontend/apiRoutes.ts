@@ -3,7 +3,7 @@ module.exports.apiRoutes = {
   logout: "/auth/logout",
   register: "/auth/register",
   post: "/posts/create",
-  token: "/token/get",
+  token: "/auth/token",
   getPosts: "/posts/get",
   votePostUp: "/posts/vote/up",
   votePostDown: "/posts/vote/down",

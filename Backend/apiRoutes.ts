@@ -1,10 +1,10 @@
 module.exports.apiRoutes = {
-  login: "/auth/login",
-  logout: "/auth/logout",
-  register: "/auth/register",
-  post: "/posts/create",
-  token: "/token/get",
-  getPosts: "/posts/get",
-  votePostUp: "/posts/vote/up",
-  votePostDown: "/posts/vote/down",
+  login: "/login",
+  logout: "/logout",
+  register: "/register",
+  token: "/token",
+  post: "/create",
+  getPosts: "/get",
+  votePostUp: "/vote/up",
+  votePostDown: "/vote/down",
 };
