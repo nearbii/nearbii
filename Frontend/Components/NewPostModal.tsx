@@ -40,7 +40,10 @@ export default function NewPostModal({
           <View style={styles.modalView}>
             <Pressable
               style={styles.pressableStart}
-              onPress={() => closeModal()}
+              onPress={() => {
+                setPostText("");
+                closeModal();
+              }}
             >
               <MaterialIcons
                 name="close"
@@ -85,7 +88,6 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingTop: 20,
     paddingBottom: 20,
-    //alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
