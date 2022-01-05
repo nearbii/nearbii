@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Link, useHistory } from "react-router-native";
 import AuthAPI from "../api/auth";
+import TokenAPI from "../api/tokens";
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -20,13 +21,11 @@ export default function Register() {
   function handleRegister() {
     if (password === confirmPassword) {
       AuthAPI.register(username, password)
-        .then(() => {
-          history.push(routes.login);
-        })
+        .then((res) => history.push(routes.login))
         .catch((err) =>
-          err.response.status === 409
+          err.response?.status === 409
             ? alert(err.response.data.message)
-            : console.log(err)
+            : console.log(err),
         );
     } else {
       alert("Passwords do not match!");

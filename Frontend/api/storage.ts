@@ -7,10 +7,11 @@ export default class StorageAPI {
       if (value !== null) {
         return value;
       }
-      throw new Error(`Couldn't find value for key '${key}'`);
+      console.error(`Couldn't find value for key '${key}'`);
+      return "";
     } catch (error) {
       console.log(error);
-      return error;
+      throw error;
     }
   }
 
@@ -18,7 +19,7 @@ export default class StorageAPI {
     try {
       await AsyncStorage.setItem(key, val);
     } catch (error) {
-      console.log(error);
+      throw error;
     }
   }
 }
